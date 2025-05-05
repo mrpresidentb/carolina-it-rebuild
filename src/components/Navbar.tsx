@@ -20,7 +20,12 @@ const Navbar = () => {
   };
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur">
+    <header 
+      className="sticky top-0 z-50 w-full border-b backdrop-blur"
+      style={{
+        backgroundColor: `var(--header-bg-color, #182B3B)`
+      }}
+    >
       <div className="container mx-auto flex h-16 items-center justify-between">
         <div className="flex items-center">
           <Link to="/" className="flex items-center">
@@ -34,31 +39,55 @@ const Navbar = () => {
         
         {/* Desktop Navigation */}
         <nav className="hidden md:flex gap-6">
-          <Link to="/" className="text-base font-medium transition-colors hover:text-itblue">
+          <Link 
+            to="/" 
+            className="text-base font-medium transition-colors hover:text-opacity-80"
+            style={{ color: `var(--header-nav-text-color, #ffffff)` }}
+          >
             Home
           </Link>
-          <Link to="/services" className="text-base font-medium transition-colors hover:text-itblue">
+          <Link 
+            to="/services" 
+            className="text-base font-medium transition-colors hover:text-opacity-80"
+            style={{ color: `var(--header-nav-text-color, #ffffff)` }}
+          >
             Services
           </Link>
           {services.map(service => (
             <Link 
               key={service.id}
               to={service.slug === "printer-services" ? "/printers" : `/services/${service.slug}`}
-              className="text-base font-medium transition-colors hover:text-itblue"
+              className="text-base font-medium transition-colors hover:text-opacity-80"
+              style={{ color: `var(--header-nav-text-color, #ffffff)` }}
             >
               {service.title}
             </Link>
           ))}
-          <Link to="/blog" className="text-base font-medium transition-colors hover:text-itblue">
+          <Link 
+            to="/blog" 
+            className="text-base font-medium transition-colors hover:text-opacity-80"
+            style={{ color: `var(--header-nav-text-color, #ffffff)` }}
+          >
             Blog
           </Link>
-          <Link to="/contact" className="text-base font-medium transition-colors hover:text-itblue">
+          <Link 
+            to="/contact" 
+            className="text-base font-medium transition-colors hover:text-opacity-80"
+            style={{ color: `var(--header-nav-text-color, #ffffff)` }}
+          >
             Contact
           </Link>
         </nav>
         
         <div className="hidden md:flex">
-          <Button asChild className="bg-itblue hover:bg-itblue-dark">
+          <Button 
+            asChild 
+            className="hover:opacity-90"
+            style={{
+              backgroundColor: `var(--button-color, #00a0c6)`,
+              color: `var(--button-text-color, #ffffff)`
+            }}
+          >
             <Link to="/contact">Get Support</Link>
           </Button>
         </div>
@@ -66,8 +95,9 @@ const Navbar = () => {
         {/* Mobile Menu Button */}
         <button 
           onClick={toggleMenu}
-          className="md:hidden p-2 text-foreground"
+          className="md:hidden p-2"
           aria-label={isMenuOpen ? "Close Menu" : "Open Menu"}
+          style={{ color: `var(--header-nav-text-color, #ffffff)` }}
         >
           {isMenuOpen ? (
             <X className="h-6 w-6" />
@@ -79,19 +109,24 @@ const Navbar = () => {
       
       {/* Mobile Navigation */}
       {isMenuOpen && (
-        <div className="fixed inset-0 top-16 z-50 bg-background md:hidden">
+        <div 
+          className="fixed inset-0 top-16 z-50 md:hidden"
+          style={{ backgroundColor: `var(--header-bg-color, #182B3B)` }}
+        >
           <nav className="container mx-auto flex flex-col space-y-4 p-4">
             <Link 
               to="/" 
-              className="py-2 text-lg font-medium hover:text-itblue"
+              className="py-2 text-lg font-medium hover:text-opacity-80"
               onClick={() => setIsMenuOpen(false)}
+              style={{ color: `var(--header-nav-text-color, #ffffff)` }}
             >
               Home
             </Link>
             <Link 
               to="/services" 
-              className="py-2 text-lg font-medium hover:text-itblue"
+              className="py-2 text-lg font-medium hover:text-opacity-80"
               onClick={() => setIsMenuOpen(false)}
+              style={{ color: `var(--header-nav-text-color, #ffffff)` }}
             >
               Services
             </Link>
@@ -99,29 +134,36 @@ const Navbar = () => {
               <Link 
                 key={service.id}
                 to={service.slug === "printer-services" ? "/printers" : `/services/${service.slug}`}
-                className="py-2 text-lg font-medium hover:text-itblue"
+                className="py-2 text-lg font-medium hover:text-opacity-80"
                 onClick={() => setIsMenuOpen(false)}
+                style={{ color: `var(--header-nav-text-color, #ffffff)` }}
               >
                 {service.title}
               </Link>
             ))}
             <Link 
               to="/blog" 
-              className="py-2 text-lg font-medium hover:text-itblue"
+              className="py-2 text-lg font-medium hover:text-opacity-80"
               onClick={() => setIsMenuOpen(false)}
+              style={{ color: `var(--header-nav-text-color, #ffffff)` }}
             >
               Blog
             </Link>
             <Link 
               to="/contact" 
-              className="py-2 text-lg font-medium hover:text-itblue"
+              className="py-2 text-lg font-medium hover:text-opacity-80"
               onClick={() => setIsMenuOpen(false)}
+              style={{ color: `var(--header-nav-text-color, #ffffff)` }}
             >
               Contact
             </Link>
             <Button 
               asChild 
-              className="mt-4 w-full bg-itblue hover:bg-itblue-dark"
+              className="mt-4 w-full hover:opacity-90"
+              style={{
+                backgroundColor: `var(--button-color, #00a0c6)`,
+                color: `var(--button-text-color, #ffffff)`
+              }}
             >
               <Link 
                 to="/contact"

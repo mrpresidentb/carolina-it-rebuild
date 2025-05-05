@@ -44,7 +44,7 @@
     --primary-color: #00a0c6;
     --link-color: #00a0c6;
     --button-color: #00a0c6;
-    --button-text-color: #000000;
+    --button-text-color: #ffffff;
     --form-text-color: #000000;
     --header-bg-color: #182B3B;
     --header-text-color: #ffffff;
@@ -91,6 +91,8 @@
   body {
     @apply bg-background text-foreground;
     font-feature-settings: "rlig" 1, "calt" 1;
+    background-color: var(--background-color);
+    color: var(--body-text-color);
   }
 
   h1, h2, h3, h4, h5, h6 {
@@ -120,9 +122,9 @@
     color: var(--link-color);
   }
 
-  .btn, .bg-itblue {
-    background-color: var(--button-color);
-    color: var(--button-text-color);
+  .btn, button.bg-itblue, a.bg-itblue {
+    background-color: var(--button-color) !important;
+    color: var(--button-text-color) !important;
   }
 
   .container {
@@ -133,5 +135,26 @@
 @layer utilities {
   .section {
     @apply py-12 md:py-16;
+  }
+  
+  /* Add utility classes for the theme colors */
+  .bg-theme-primary {
+    background-color: var(--primary-color);
+  }
+  
+  .text-theme-primary {
+    color: var(--primary-color);
+  }
+  
+  .bg-header {
+    background-color: var(--header-bg-color);
+  }
+  
+  .text-header {
+    color: var(--header-text-color);
+  }
+  
+  .bg-footer {
+    background-color: var(--footer-bg-color);
   }
 }

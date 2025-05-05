@@ -31,9 +31,36 @@ a {
   color: var(--link-color, #00a0c6);
 }
 
-button {
+button, .btn {
   background-color: var(--button-color, #00a0c6);
-  color: var(--button-text-color, #000000);
+  color: var(--button-text-color, #ffffff);
+}
+
+header {
+  background-color: var(--header-bg-color, #182B3B);
+}
+
+header a, header .text-foreground {
+  color: var(--header-nav-text-color, #ffffff);
+}
+
+footer {
+  background-color: var(--footer-bg-color, #f1f5f9);
+}
+
+/* Override any conflicting tailwind classes */
+.bg-itblue {
+  background-color: var(--button-color, #00a0c6) !important;
+  color: var(--button-text-color, #ffffff) !important;
+}
+
+.hover\:bg-itblue:hover {
+  background-color: var(--button-color, #00a0c6) !important;
+  opacity: 0.9;
+}
+
+.hover\:text-itblue:hover {
+  color: var(--link-color, #00a0c6) !important;
 }
 
 /* Keep the original animations and effects */

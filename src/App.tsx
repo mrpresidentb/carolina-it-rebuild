@@ -1,3 +1,4 @@
+
 import React, { useEffect } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
@@ -39,7 +40,7 @@ const applyThemeSettings = () => {
         primaryColor: "#00a0c6",
         linkColor: "#00a0c6",
         buttonColor: "#00a0c6",
-        buttonTextColor: "#000000",
+        buttonTextColor: "#ffffff", // Changed to white for better contrast
         formTextColor: "#000000",
         headerBgColor: "#182B3B",
         headerTextColor: "#ffffff", 
@@ -63,7 +64,7 @@ const applyThemeSettings = () => {
       document.documentElement.style.setProperty('--primary-color', styling.primaryColor || '#00a0c6');
       document.documentElement.style.setProperty('--link-color', styling.linkColor || '#00a0c6');
       document.documentElement.style.setProperty('--button-color', styling.buttonColor || '#00a0c6');
-      document.documentElement.style.setProperty('--button-text-color', styling.buttonTextColor || '#000000');
+      document.documentElement.style.setProperty('--button-text-color', styling.buttonTextColor || '#ffffff');
       document.documentElement.style.setProperty('--form-text-color', styling.formTextColor || '#000000');
       document.documentElement.style.setProperty('--header-bg-color', styling.headerBgColor || '#182B3B');
       document.documentElement.style.setProperty('--header-text-color', styling.headerTextColor || '#ffffff');
@@ -73,6 +74,9 @@ const applyThemeSettings = () => {
       // If no styling found in localStorage, apply defaults
       applyDefaultThemeSettings();
     }
+    
+    // Apply the theme settings immediately to all elements that should use them
+    document.body.style.backgroundColor = getComputedStyle(document.documentElement).getPropertyValue('--background-color').trim();
   } catch (error) {
     console.error("Error applying theme settings:", error);
     // Apply defaults if there's an error
@@ -90,7 +94,7 @@ const applyDefaultThemeSettings = () => {
   document.documentElement.style.setProperty('--primary-color', '#00a0c6');
   document.documentElement.style.setProperty('--link-color', '#00a0c6');
   document.documentElement.style.setProperty('--button-color', '#00a0c6');
-  document.documentElement.style.setProperty('--button-text-color', '#000000');
+  document.documentElement.style.setProperty('--button-text-color', '#ffffff');
   document.documentElement.style.setProperty('--form-text-color', '#000000');
   document.documentElement.style.setProperty('--header-bg-color', '#182B3B');
   document.documentElement.style.setProperty('--header-text-color', '#ffffff');
@@ -99,9 +103,20 @@ const applyDefaultThemeSettings = () => {
 };
 
 const App = () => {
-  // Apply theme settings when the app loads
+  // Apply theme settings when the app loads and whenever the component rerenders
   useEffect(() => {
     applyThemeSettings();
+    
+    // Set up an event listener to detect when localStorage changes
+    const handleStorageChange = () => {
+      applyThemeSettings();
+    };
+    
+    window.addEventListener('storage', handleStorageChange);
+    
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+    };
   }, []);
 
   // Create a layout component to avoid repetition
