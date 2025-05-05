@@ -67,35 +67,57 @@ const availablePages = [
 const getSettings = (): SiteSettings => {
   const savedSettings = localStorage.getItem('site_settings');
   if (savedSettings) {
-    return JSON.parse(savedSettings);
+    try {
+      const parsed = JSON.parse(savedSettings);
+      
+      // Ensure all required pages exist in pageSeo
+      const defaultPageSeo = {
+        title: "",
+        description: "",
+        noIndex: false
+      };
+      
+      // Make sure all available pages have entries
+      availablePages.forEach(page => {
+        if (!parsed.seo.pageSeo || !parsed.seo.pageSeo[page.value]) {
+          if (!parsed.seo.pageSeo) {
+            parsed.seo.pageSeo = {};
+          }
+          parsed.seo.pageSeo[page.value] = defaultPageSeo;
+        }
+      });
+      
+      return parsed;
+    } catch (error) {
+      console.error("Error parsing saved settings:", error);
+      return getDefaultSettings();
+    }
   }
+  return getDefaultSettings();
+};
+
+// Default settings as a separate function for clarity
+const getDefaultSettings = (): SiteSettings => {
+  // Create default pageSeo object with all available pages
+  const defaultPageSeo = {};
+  availablePages.forEach(page => {
+    defaultPageSeo[page.value] = {
+      title: page.value === "/" 
+        ? "IT Carolina - Expert On-Site IT Support in Charlotte"
+        : `${page.label.replace(" Page", "")} - IT Carolina`,
+      description: page.value === "/" 
+        ? "Professional IT support and services for businesses of all sizes in Charlotte, NC. We specialize in software troubleshooting, printer setup, and more."
+        : `Our ${page.label.toLowerCase().replace(" page", "")} page with information about IT Carolina.`,
+      noIndex: false
+    };
+  });
+
   return {
     seo: {
       siteTitle: "IT Carolina - Expert On-Site IT Support in Charlotte",
       siteDescription: "Professional IT support and services for businesses of all sizes in Charlotte, NC. We specialize in software troubleshooting, printer setup, and more.",
       defaultKeywords: "IT support, computer repair, tech services, Charlotte, printer services",
-      pageSeo: {
-        "/": {
-          title: "IT Carolina - Expert On-Site IT Support in Charlotte",
-          description: "Professional IT support and services for businesses of all sizes in Charlotte, NC. We specialize in software troubleshooting, printer setup, and more.",
-          noIndex: false
-        },
-        "/services": {
-          title: "IT Services - IT Carolina",
-          description: "Our comprehensive IT services include computer repair, network solutions, software support and more.",
-          noIndex: false
-        },
-        "/blog": {
-          title: "IT Blog - IT Carolina",
-          description: "Latest news, tips and updates about IT services and technology trends.",
-          noIndex: false
-        },
-        "/contact": {
-          title: "Contact Us - IT Carolina",
-          description: "Get in touch with our IT support team in Charlotte, NC for expert technology assistance.",
-          noIndex: false
-        }
-      },
+      pageSeo: defaultPageSeo,
       socialMedia: {
         ogTitle: "",
         ogDescription: "",
@@ -119,7 +141,7 @@ const getSettings = (): SiteSettings => {
       buttonTextColor: "#ffffff",
       formTextColor: "#000000",
       headerBgColor: "#182B3B",
-      headerTextColor: "#ffffff",
+      headerTextColor: "#ffffff", 
       headerNavTextColor: "#ffffff",
       footerBgColor: "#f1f5f9"
     }
@@ -256,6 +278,11 @@ const AdminSettings = () => {
     document.documentElement.style.setProperty('--footer-bg-color', settings.styling.footerBgColor);
   };
 
+  // Add a null check before accessing settings.seo.pageSeo[selectedPage]
+  const pageSeoData = selectedPage && settings?.seo?.pageSeo?.[selectedPage] ? 
+    settings.seo.pageSeo[selectedPage] : 
+    { title: "", description: "", noIndex: false };
+
   return (
     <AdminLayout title="Settings">
       <header className="mb-8 pb-4 border-b">
@@ -361,47 +388,44 @@ const AdminSettings = () => {
                 </Select>
               </div>
 
-              {selectedPage && settings.seo.pageSeo[selectedPage] && (
-                <>
-                  <div>
-                    <label htmlFor="pageTitle" className="block text-sm font-medium mb-1">
-                      Page Title
-                    </label>
-                    <Input 
-                      id="pageTitle"
-                      name="title"
-                      value={settings.seo.pageSeo[selectedPage].title} 
-                      onChange={handlePageSeoChange}
-                      placeholder="Page title"
-                    />
-                  </div>
-                  <div>
-                    <label htmlFor="pageDescription" className="block text-sm font-medium mb-1">
-                      Page Description
-                    </label>
-                    <Textarea 
-                      id="pageDescription"
-                      name="description"
-                      value={settings.seo.pageSeo[selectedPage].description} 
-                      onChange={handlePageSeoChange}
-                      placeholder="Page description"
-                    />
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <Checkbox 
-                      id="noIndex" 
-                      checked={settings.seo.pageSeo[selectedPage].noIndex}
-                      onCheckedChange={handlePageNoIndexChange}
-                    />
-                    <label
-                      htmlFor="noIndex"
-                      className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                    >
-                      Exclude from search engines (noindex)
-                    </label>
-                  </div>
-                </>
-              )}
+              {/* Use pageSeoData with null checks instead of directly accessing potentially undefined values */}
+              <div>
+                <label htmlFor="pageTitle" className="block text-sm font-medium mb-1">
+                  Page Title
+                </label>
+                <Input 
+                  id="pageTitle"
+                  name="title"
+                  value={pageSeoData.title} 
+                  onChange={handlePageSeoChange}
+                  placeholder="Page title"
+                />
+              </div>
+              <div>
+                <label htmlFor="pageDescription" className="block text-sm font-medium mb-1">
+                  Page Description
+                </label>
+                <Textarea 
+                  id="pageDescription"
+                  name="description"
+                  value={pageSeoData.description} 
+                  onChange={handlePageSeoChange}
+                  placeholder="Page description"
+                />
+              </div>
+              <div className="flex items-center space-x-2">
+                <Checkbox 
+                  id="noIndex" 
+                  checked={pageSeoData.noIndex}
+                  onCheckedChange={handlePageNoIndexChange}
+                />
+                <label
+                  htmlFor="noIndex"
+                  className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                >
+                  Exclude from search engines (noindex)
+                </label>
+              </div>
             </CardContent>
           </Card>
 
