@@ -2,7 +2,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Computer, Settings, Printer, Internet, Wrench, Bug, Download, Wifi, Mail } from 'lucide-react';
+import { Computer, Settings, Printer, Globe, Wrench, Bug, Download, Wifi, Mail } from 'lucide-react';
 
 const services = [
   {
@@ -26,7 +26,7 @@ const services = [
   {
     id: 4,
     title: "Internet Issues",
-    icon: Internet,
+    icon: Globe,
     description: "Resolving connectivity problems, slow speeds, and setting up secure networks."
   },
   {

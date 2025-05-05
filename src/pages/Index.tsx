@@ -3,7 +3,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import ContactForm from '@/components/ContactForm';
-import { Computer, Printer, Internet, Bug } from 'lucide-react';
+import { Computer, Printer, Globe, Bug } from 'lucide-react';
 
 const Index = () => {
   return (
@@ -72,7 +72,7 @@ const Index = () => {
             
             <div className="bg-gray-50 p-6 rounded-lg shadow-sm hover:shadow-md transition-shadow">
               <div className="h-12 w-12 rounded-full bg-itblue/10 flex items-center justify-center mb-4">
-                <Internet className="h-6 w-6 text-itblue" />
+                <Globe className="h-6 w-6 text-itblue" />
               </div>
               <h3 className="text-xl font-semibold mb-2">Network Solutions</h3>
               <p className="text-gray-600">
