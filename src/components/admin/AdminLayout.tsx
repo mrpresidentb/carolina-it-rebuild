@@ -72,6 +72,16 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children, title }) => {
                   Blog
                 </Button>
               </li>
+              <li>
+                <Button 
+                  variant="ghost" 
+                  className={`w-full justify-start ${title === 'Settings' ? 'bg-gray-100' : ''}`}
+                  onClick={() => navigate('/admin/settings')}
+                >
+                  <Settings className="mr-2 h-4 w-4" />
+                  Settings
+                </Button>
+              </li>
               <li className="pt-4 border-t mt-4">
                 <Button 
                   variant="ghost" 

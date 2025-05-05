@@ -19,6 +19,7 @@ import AdminLogin from "./pages/admin/AdminLogin";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import AdminServices from "./pages/admin/AdminServices";
 import AdminBlog from "./pages/admin/AdminBlog";
+import AdminSettings from "./pages/admin/AdminSettings";
 
 const queryClient = new QueryClient();
 
@@ -36,6 +37,7 @@ const App = () => (
               <Route path="/admin/dashboard" element={<AdminDashboard />} />
               <Route path="/admin/services" element={<AdminServices />} />
               <Route path="/admin/blog" element={<AdminBlog />} />
+              <Route path="/admin/settings" element={<AdminSettings />} />
               
               {/* Public Routes */}
               <Route path="/" element={
