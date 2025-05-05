@@ -1,4 +1,5 @@
 
+import React from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -22,70 +23,72 @@ import AdminBlog from "./pages/admin/AdminBlog";
 const queryClient = new QueryClient();
 
 const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
+  <React.StrictMode>
+    <QueryClientProvider client={queryClient}>
       <AdminAuthProvider>
-        <Toaster />
-        <Sonner />
-        <BrowserRouter>
-          <Routes>
-            {/* Admin Routes */}
-            <Route path="/admin" element={<AdminLogin />} />
-            <Route path="/admin/dashboard" element={<AdminDashboard />} />
-            <Route path="/admin/services" element={<AdminServices />} />
-            <Route path="/admin/blog" element={<AdminBlog />} />
-            
-            {/* Public Routes */}
-            <Route path="/" element={
-              <div className="flex min-h-screen flex-col">
-                <Navbar />
-                <div className="flex-1">
-                  <Index />
+        <TooltipProvider>
+          <Toaster />
+          <Sonner />
+          <BrowserRouter>
+            <Routes>
+              {/* Admin Routes */}
+              <Route path="/admin" element={<AdminLogin />} />
+              <Route path="/admin/dashboard" element={<AdminDashboard />} />
+              <Route path="/admin/services" element={<AdminServices />} />
+              <Route path="/admin/blog" element={<AdminBlog />} />
+              
+              {/* Public Routes */}
+              <Route path="/" element={
+                <div className="flex min-h-screen flex-col">
+                  <Navbar />
+                  <div className="flex-1">
+                    <Index />
+                  </div>
+                  <Footer />
                 </div>
-                <Footer />
-              </div>
-            } />
-            <Route path="/services" element={
-              <div className="flex min-h-screen flex-col">
-                <Navbar />
-                <div className="flex-1">
-                  <Services />
+              } />
+              <Route path="/services" element={
+                <div className="flex min-h-screen flex-col">
+                  <Navbar />
+                  <div className="flex-1">
+                    <Services />
+                  </div>
+                  <Footer />
                 </div>
-                <Footer />
-              </div>
-            } />
-            <Route path="/printers" element={
-              <div className="flex min-h-screen flex-col">
-                <Navbar />
-                <div className="flex-1">
-                  <Printers />
+              } />
+              <Route path="/printers" element={
+                <div className="flex min-h-screen flex-col">
+                  <Navbar />
+                  <div className="flex-1">
+                    <Printers />
+                  </div>
+                  <Footer />
                 </div>
-                <Footer />
-              </div>
-            } />
-            <Route path="/contact" element={
-              <div className="flex min-h-screen flex-col">
-                <Navbar />
-                <div className="flex-1">
-                  <Contact />
+              } />
+              <Route path="/contact" element={
+                <div className="flex min-h-screen flex-col">
+                  <Navbar />
+                  <div className="flex-1">
+                    <Contact />
+                  </div>
+                  <Footer />
                 </div>
-                <Footer />
-              </div>
-            } />
-            <Route path="*" element={
-              <div className="flex min-h-screen flex-col">
-                <Navbar />
-                <div className="flex-1">
-                  <NotFound />
+              } />
+              <Route path="*" element={
+                <div className="flex min-h-screen flex-col">
+                  <Navbar />
+                  <div className="flex-1">
+                    <NotFound />
+                  </div>
+                  <Footer />
                 </div>
-                <Footer />
-              </div>
-            } />
-          </Routes>
-        </BrowserRouter>
+              } />
+            </Routes>
+          </BrowserRouter>
+        </TooltipProvider>
       </AdminAuthProvider>
-    </TooltipProvider>
-  </QueryClientProvider>
+    </QueryClientProvider>
+  </React.StrictMode>
 );
 
 export default App;
