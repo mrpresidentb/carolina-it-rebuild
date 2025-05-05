@@ -34,6 +34,22 @@
     --ring: 199 89% 57%;
 
     --radius: 0.5rem;
+    
+    /* Custom theme variables */
+    --h1-color: #000000;
+    --h2-color: #000000;
+    --h3-color: #000000;
+    --body-text-color: #000000;
+    --background-color: #f6f6f7;
+    --primary-color: #00a0c6;
+    --link-color: #00a0c6;
+    --button-color: #00a0c6;
+    --button-text-color: #ffffff;
+    --form-text-color: #000000;
+    --header-bg-color: #182B3B;
+    --header-text-color: #ffffff;
+    --header-nav-text-color: #ffffff;
+    --footer-bg-color: #f1f5f9;
   }
 
   .dark {
@@ -83,16 +99,32 @@
   
   h1 {
     @apply text-3xl md:text-4xl;
+    color: var(--h1-color);
   }
   
   h2 {
     @apply text-2xl md:text-3xl;
+    color: var(--h2-color);
   }
   
   h3 {
     @apply text-xl md:text-2xl;
+    color: var(--h3-color);
   }
   
+  p {
+    color: var(--body-text-color);
+  }
+  
+  a:not(.btn) {
+    color: var(--link-color);
+  }
+
+  .btn, .bg-itblue {
+    background-color: var(--button-color);
+    color: var(--button-text-color);
+  }
+
   .container {
     @apply px-4 md:px-6;
   }
@@ -103,3 +135,4 @@
     @apply py-12 md:py-16;
   }
 }
+

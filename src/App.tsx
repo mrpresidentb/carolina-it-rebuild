@@ -10,6 +10,8 @@ import Index from "./pages/Index";
 import Services from "./pages/Services";
 import Printers from "./pages/Printers";
 import Contact from "./pages/Contact";
+import Blog from "./pages/Blog";
+import BlogPost from "./pages/BlogPost";
 import NotFound from "./pages/NotFound";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
@@ -72,6 +74,24 @@ const App = () => (
                   <Navbar />
                   <div className="flex-1">
                     <Contact />
+                  </div>
+                  <Footer />
+                </div>
+              } />
+              <Route path="/blog" element={
+                <div className="flex min-h-screen flex-col">
+                  <Navbar />
+                  <div className="flex-1">
+                    <Blog />
+                  </div>
+                  <Footer />
+                </div>
+              } />
+              <Route path="/blog/:id" element={
+                <div className="flex min-h-screen flex-col">
+                  <Navbar />
+                  <div className="flex-1">
+                    <BlogPost />
                   </div>
                   <Footer />
                 </div>
