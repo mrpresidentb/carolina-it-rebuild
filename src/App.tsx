@@ -28,33 +28,74 @@ const queryClient = new QueryClient();
 // Function to apply theme settings from localStorage
 const applyThemeSettings = () => {
   try {
-    const savedSettings = localStorage.getItem('site_settings');
-    if (savedSettings) {
-      const settings = JSON.parse(savedSettings);
-      
-      if (settings?.styling) {
-        const styling = settings.styling;
-        
-        // Apply all styling variables to CSS root
-        document.documentElement.style.setProperty('--h1-color', styling.h1Color || '#000000');
-        document.documentElement.style.setProperty('--h2-color', styling.h2Color || '#000000');
-        document.documentElement.style.setProperty('--h3-color', styling.h3Color || '#000000');
-        document.documentElement.style.setProperty('--body-text-color', styling.bodyTextColor || '#000000');
-        document.documentElement.style.setProperty('--background-color', styling.backgroundColor || '#f6f6f7');
-        document.documentElement.style.setProperty('--primary-color', styling.primaryColor || '#00a0c6');
-        document.documentElement.style.setProperty('--link-color', styling.linkColor || '#00a0c6');
-        document.documentElement.style.setProperty('--button-color', styling.buttonColor || '#00a0c6');
-        document.documentElement.style.setProperty('--button-text-color', styling.buttonTextColor || '#ffffff');
-        document.documentElement.style.setProperty('--form-text-color', styling.formTextColor || '#000000');
-        document.documentElement.style.setProperty('--header-bg-color', styling.headerBgColor || '#182B3B');
-        document.documentElement.style.setProperty('--header-text-color', styling.headerTextColor || '#ffffff');
-        document.documentElement.style.setProperty('--header-nav-text-color', styling.headerNavTextColor || '#ffffff');
-        document.documentElement.style.setProperty('--footer-bg-color', styling.footerBgColor || '#f1f5f9');
+    // Default theme values matching the image
+    const defaultSettings = {
+      styling: {
+        h1Color: "#000000",
+        h2Color: "#000000",
+        h3Color: "#000000",
+        bodyTextColor: "#000000",
+        backgroundColor: "#f6f6f7",
+        primaryColor: "#00a0c6",
+        linkColor: "#00a0c6",
+        buttonColor: "#00a0c6",
+        buttonTextColor: "#000000",
+        formTextColor: "#000000",
+        headerBgColor: "#182B3B",
+        headerTextColor: "#ffffff", 
+        headerNavTextColor: "#ffffff",
+        footerBgColor: "#f1f5f9"
       }
+    };
+    
+    const savedSettings = localStorage.getItem('site_settings');
+    const settings = savedSettings ? JSON.parse(savedSettings) : defaultSettings;
+      
+    if (settings?.styling) {
+      const styling = settings.styling;
+      
+      // Apply all styling variables to CSS root
+      document.documentElement.style.setProperty('--h1-color', styling.h1Color || '#000000');
+      document.documentElement.style.setProperty('--h2-color', styling.h2Color || '#000000');
+      document.documentElement.style.setProperty('--h3-color', styling.h3Color || '#000000');
+      document.documentElement.style.setProperty('--body-text-color', styling.bodyTextColor || '#000000');
+      document.documentElement.style.setProperty('--background-color', styling.backgroundColor || '#f6f6f7');
+      document.documentElement.style.setProperty('--primary-color', styling.primaryColor || '#00a0c6');
+      document.documentElement.style.setProperty('--link-color', styling.linkColor || '#00a0c6');
+      document.documentElement.style.setProperty('--button-color', styling.buttonColor || '#00a0c6');
+      document.documentElement.style.setProperty('--button-text-color', styling.buttonTextColor || '#000000');
+      document.documentElement.style.setProperty('--form-text-color', styling.formTextColor || '#000000');
+      document.documentElement.style.setProperty('--header-bg-color', styling.headerBgColor || '#182B3B');
+      document.documentElement.style.setProperty('--header-text-color', styling.headerTextColor || '#ffffff');
+      document.documentElement.style.setProperty('--header-nav-text-color', styling.headerNavTextColor || '#ffffff');
+      document.documentElement.style.setProperty('--footer-bg-color', styling.footerBgColor || '#f1f5f9');
+    } else {
+      // If no styling found in localStorage, apply defaults
+      applyDefaultThemeSettings();
     }
   } catch (error) {
     console.error("Error applying theme settings:", error);
+    // Apply defaults if there's an error
+    applyDefaultThemeSettings();
   }
+};
+
+// Function to apply default theme settings
+const applyDefaultThemeSettings = () => {
+  document.documentElement.style.setProperty('--h1-color', '#000000');
+  document.documentElement.style.setProperty('--h2-color', '#000000');
+  document.documentElement.style.setProperty('--h3-color', '#000000');
+  document.documentElement.style.setProperty('--body-text-color', '#000000');
+  document.documentElement.style.setProperty('--background-color', '#f6f6f7');
+  document.documentElement.style.setProperty('--primary-color', '#00a0c6');
+  document.documentElement.style.setProperty('--link-color', '#00a0c6');
+  document.documentElement.style.setProperty('--button-color', '#00a0c6');
+  document.documentElement.style.setProperty('--button-text-color', '#000000');
+  document.documentElement.style.setProperty('--form-text-color', '#000000');
+  document.documentElement.style.setProperty('--header-bg-color', '#182B3B');
+  document.documentElement.style.setProperty('--header-text-color', '#ffffff');
+  document.documentElement.style.setProperty('--header-nav-text-color', '#ffffff');
+  document.documentElement.style.setProperty('--footer-bg-color', '#f1f5f9');
 };
 
 const App = () => {

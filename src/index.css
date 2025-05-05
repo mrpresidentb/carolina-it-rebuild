@@ -35,7 +35,7 @@
 
     --radius: 0.5rem;
     
-    /* Custom theme variables */
+    /* Custom theme variables with the values from the image */
     --h1-color: #000000;
     --h2-color: #000000;
     --h3-color: #000000;
@@ -44,7 +44,7 @@
     --primary-color: #00a0c6;
     --link-color: #00a0c6;
     --button-color: #00a0c6;
-    --button-text-color: #ffffff;
+    --button-text-color: #000000;
     --form-text-color: #000000;
     --header-bg-color: #182B3B;
     --header-text-color: #ffffff;
@@ -135,4 +135,3 @@
     @apply py-12 md:py-16;
   }
 }
-

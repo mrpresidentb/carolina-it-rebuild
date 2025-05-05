@@ -156,7 +156,7 @@ const getDefaultSettings = (): SiteSettings => {
       primaryColor: "#00a0c6",
       linkColor: "#00a0c6",
       buttonColor: "#00a0c6",
-      buttonTextColor: "#ffffff",
+      buttonTextColor: "#000000",
       formTextColor: "#000000",
       headerBgColor: "#182B3B",
       headerTextColor: "#ffffff", 

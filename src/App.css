@@ -11,13 +11,29 @@ h1, h2, h3, h4, h5, h6 {
   color: inherit;
 }
 
+h1 {
+  color: var(--h1-color, #000000);
+}
+
+h2 {
+  color: var(--h2-color, #000000);
+}
+
+h3 {
+  color: var(--h3-color, #000000);
+}
+
+p {
+  color: var(--body-text-color, #000000);
+}
+
 a {
   color: var(--link-color, #00a0c6);
 }
 
 button {
   background-color: var(--button-color, #00a0c6);
-  color: var(--button-text-color, #ffffff);
+  color: var(--button-text-color, #000000);
 }
 
 /* Keep the original animations and effects */
