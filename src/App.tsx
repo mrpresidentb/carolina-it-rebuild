@@ -1,4 +1,3 @@
-
 import React, { useEffect } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
@@ -15,6 +14,7 @@ import BlogPost from "./pages/BlogPost";
 import NotFound from "./pages/NotFound";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
+import ServicePage from "./pages/ServicePage";
 
 // Admin Pages
 import AdminLogin from "./pages/admin/AdminLogin";
@@ -104,6 +104,15 @@ const App = () => {
     applyThemeSettings();
   }, []);
 
+  // Create a layout component to avoid repetition
+  const Layout = ({ children }: { children: React.ReactNode }) => (
+    <div className="flex min-h-screen flex-col">
+      <Navbar />
+      <div className="flex-1">{children}</div>
+      <Footer />
+    </div>
+  );
+
   return (
     <React.StrictMode>
       <QueryClientProvider client={queryClient}>
@@ -122,67 +131,45 @@ const App = () => {
                 
                 {/* Public Routes */}
                 <Route path="/" element={
-                  <div className="flex min-h-screen flex-col">
-                    <Navbar />
-                    <div className="flex-1">
-                      <Index />
-                    </div>
-                    <Footer />
-                  </div>
+                  <Layout>
+                    <Index />
+                  </Layout>
                 } />
                 <Route path="/services" element={
-                  <div className="flex min-h-screen flex-col">
-                    <Navbar />
-                    <div className="flex-1">
-                      <Services />
-                    </div>
-                    <Footer />
-                  </div>
+                  <Layout>
+                    <Services />
+                  </Layout>
                 } />
                 <Route path="/printers" element={
-                  <div className="flex min-h-screen flex-col">
-                    <Navbar />
-                    <div className="flex-1">
-                      <Printers />
-                    </div>
-                    <Footer />
-                  </div>
+                  <Layout>
+                    <Printers />
+                  </Layout>
                 } />
                 <Route path="/contact" element={
-                  <div className="flex min-h-screen flex-col">
-                    <Navbar />
-                    <div className="flex-1">
-                      <Contact />
-                    </div>
-                    <Footer />
-                  </div>
+                  <Layout>
+                    <Contact />
+                  </Layout>
                 } />
                 <Route path="/blog" element={
-                  <div className="flex min-h-screen flex-col">
-                    <Navbar />
-                    <div className="flex-1">
-                      <Blog />
-                    </div>
-                    <Footer />
-                  </div>
+                  <Layout>
+                    <Blog />
+                  </Layout>
                 } />
                 <Route path="/blog/:id" element={
-                  <div className="flex min-h-screen flex-col">
-                    <Navbar />
-                    <div className="flex-1">
-                      <BlogPost />
-                    </div>
-                    <Footer />
-                  </div>
+                  <Layout>
+                    <BlogPost />
+                  </Layout>
+                } />
+                {/* Dynamic Service Pages */}
+                <Route path="/services/:slug" element={
+                  <Layout>
+                    <ServicePage />
+                  </Layout>
                 } />
                 <Route path="*" element={
-                  <div className="flex min-h-screen flex-col">
-                    <Navbar />
-                    <div className="flex-1">
-                      <NotFound />
-                    </div>
-                    <Footer />
-                  </div>
+                  <Layout>
+                    <NotFound />
+                  </Layout>
                 } />
               </Routes>
             </BrowserRouter>

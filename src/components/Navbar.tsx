@@ -1,11 +1,19 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Menu, X } from 'lucide-react';
+import { getVisibleServices } from '@/utils/services';
+import { Service } from '@/models/Service';
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [services, setServices] = useState<Service[]>([]);
+
+  useEffect(() => {
+    // Get visible services for the navigation
+    setServices(getVisibleServices());
+  }, []);
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
@@ -32,9 +40,17 @@ const Navbar = () => {
           <Link to="/services" className="text-base font-medium transition-colors hover:text-itblue">
             Services
           </Link>
-          <Link to="/printers" className="text-base font-medium transition-colors hover:text-itblue">
-            Printer Services
-          </Link>
+          {services.map(service => (
+            service.title !== "IT Support" && service.title !== "Printer Services" && (
+              <Link 
+                key={service.id}
+                to={`/services/${service.slug}`} 
+                className="text-base font-medium transition-colors hover:text-itblue"
+              >
+                {service.title}
+              </Link>
+            )
+          ))}
           <Link to="/blog" className="text-base font-medium transition-colors hover:text-itblue">
             Blog
           </Link>
@@ -81,13 +97,18 @@ const Navbar = () => {
             >
               Services
             </Link>
-            <Link 
-              to="/printers" 
-              className="py-2 text-lg font-medium hover:text-itblue"
-              onClick={() => setIsMenuOpen(false)}
-            >
-              Printer Services
-            </Link>
+            {services.map(service => (
+              service.title !== "IT Support" && service.title !== "Printer Services" && (
+                <Link 
+                  key={service.id}
+                  to={`/services/${service.slug}`} 
+                  className="py-2 text-lg font-medium hover:text-itblue"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  {service.title}
+                </Link>
+              )
+            ))}
             <Link 
               to="/blog" 
               className="py-2 text-lg font-medium hover:text-itblue"
