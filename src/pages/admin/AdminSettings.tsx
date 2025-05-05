@@ -7,7 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { toast } from '@/hooks/use-toast';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ColorPicker, Heading, Image, Settings } from 'lucide-react';
+import { Palette, Heading, Image, Settings } from 'lucide-react';
 
 // Define settings structure
 interface SiteSettings {
@@ -171,7 +171,7 @@ const AdminSettings = () => {
             <CardHeader>
               <CardTitle>
                 <div className="flex items-center">
-                  <ColorPicker className="mr-2 h-5 w-5" />
+                  <Palette className="mr-2 h-5 w-5" />
                   Style Settings
                 </div>
               </CardTitle>
