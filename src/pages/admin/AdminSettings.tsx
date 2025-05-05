@@ -86,6 +86,24 @@ const getSettings = (): SiteSettings => {
           parsed.seo.pageSeo[page.value] = defaultPageSeo;
         }
       });
+
+      // Ensure socialMedia object exists
+      if (!parsed.seo.socialMedia) {
+        parsed.seo.socialMedia = {
+          ogTitle: "",
+          ogDescription: "",
+          ogImage: ""
+        };
+      }
+
+      // Ensure advanced object exists
+      if (!parsed.seo.advanced) {
+        parsed.seo.advanced = {
+          canonicalUrl: "",
+          structuredData: '{"@context":"https://schema.org","@type":"Organization","name":"IT Carolina"}',
+          excludeFromSearch: false
+        };
+      }
       
       return parsed;
     } catch (error) {
