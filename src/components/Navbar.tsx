@@ -41,15 +41,13 @@ const Navbar = () => {
             Services
           </Link>
           {services.map(service => (
-            service.title !== "IT Support" && service.title !== "Printer Services" && (
-              <Link 
-                key={service.id}
-                to={`/services/${service.slug}`} 
-                className="text-base font-medium transition-colors hover:text-itblue"
-              >
-                {service.title}
-              </Link>
-            )
+            <Link 
+              key={service.id}
+              to={service.slug === "printer-services" ? "/printers" : `/services/${service.slug}`}
+              className="text-base font-medium transition-colors hover:text-itblue"
+            >
+              {service.title}
+            </Link>
           ))}
           <Link to="/blog" className="text-base font-medium transition-colors hover:text-itblue">
             Blog
@@ -98,16 +96,14 @@ const Navbar = () => {
               Services
             </Link>
             {services.map(service => (
-              service.title !== "IT Support" && service.title !== "Printer Services" && (
-                <Link 
-                  key={service.id}
-                  to={`/services/${service.slug}`} 
-                  className="py-2 text-lg font-medium hover:text-itblue"
-                  onClick={() => setIsMenuOpen(false)}
-                >
-                  {service.title}
-                </Link>
-              )
+              <Link 
+                key={service.id}
+                to={service.slug === "printer-services" ? "/printers" : `/services/${service.slug}`}
+                className="py-2 text-lg font-medium hover:text-itblue"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                {service.title}
+              </Link>
             ))}
             <Link 
               to="/blog" 
