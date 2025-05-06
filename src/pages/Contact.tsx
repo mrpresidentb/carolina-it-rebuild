@@ -1,8 +1,11 @@
 
 import React from 'react';
 import ContactForm from '@/components/ContactForm';
+import { useSettings } from '@/hooks/useSettings';
 
 const Contact = () => {
+  const { settings } = useSettings();
+  
   return (
     <main>
       {/* Hero Section */}
@@ -32,7 +35,7 @@ const Contact = () => {
                   <div>
                     <h3 className="text-lg font-medium mb-1">Phone</h3>
                     <p className="text-gray-600">
-                      <a href="tel:+17043185006" className="hover:text-itblue">(704) 318-5006</a>
+                      <a href={`tel:${settings.contact.phone}`} className="hover:text-itblue">{settings.contact.phone}</a>
                     </p>
                   </div>
                 </div>
@@ -46,7 +49,7 @@ const Contact = () => {
                   <div>
                     <h3 className="text-lg font-medium mb-1">Email</h3>
                     <p className="text-gray-600">
-                      <a href="mailto:info@itcarolina.us" className="hover:text-itblue">info@itcarolina.us</a>
+                      <a href={`mailto:${settings.contact.email}`} className="hover:text-itblue">{settings.contact.email}</a>
                     </p>
                   </div>
                 </div>
@@ -60,7 +63,7 @@ const Contact = () => {
                   </div>
                   <div>
                     <h3 className="text-lg font-medium mb-1">Location</h3>
-                    <p className="text-gray-600">Charlotte, NC</p>
+                    <p className="text-gray-600">{settings.contact.address}</p>
                   </div>
                 </div>
               </div>
@@ -69,16 +72,32 @@ const Contact = () => {
                 <h3 className="text-lg font-medium mb-4">Business Hours</h3>
                 <div className="space-y-1">
                   <div className="flex justify-between">
-                    <span className="text-gray-600">Monday - Friday</span>
-                    <span className="font-medium">9:00 AM - 6:00 PM</span>
+                    <span className="text-gray-600">Monday</span>
+                    <span className="font-medium">{settings.contact.businessHours.monday}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Tuesday</span>
+                    <span className="font-medium">{settings.contact.businessHours.tuesday}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Wednesday</span>
+                    <span className="font-medium">{settings.contact.businessHours.wednesday}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Thursday</span>
+                    <span className="font-medium">{settings.contact.businessHours.thursday}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Friday</span>
+                    <span className="font-medium">{settings.contact.businessHours.friday}</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-gray-600">Saturday</span>
-                    <span className="font-medium">By appointment</span>
+                    <span className="font-medium">{settings.contact.businessHours.saturday}</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-gray-600">Sunday</span>
-                    <span className="font-medium">Closed</span>
+                    <span className="font-medium">{settings.contact.businessHours.sunday}</span>
                   </div>
                 </div>
               </div>

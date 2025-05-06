@@ -7,52 +7,11 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { toast } from '@/hooks/use-toast';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Palette, Heading, Image, Settings, Link as LinkIcon } from 'lucide-react';
+import { Palette, Heading, Image, Settings, Link as LinkIcon, Phone, Mail, MapPin, Clock } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
-
-// Define settings structure
-interface SiteSettings {
-  seo: {
-    siteTitle: string;
-    siteDescription: string;
-    defaultKeywords: string;
-    pageSeo: {
-      [key: string]: {
-        title: string;
-        description: string;
-        noIndex: boolean;
-      }
-    },
-    socialMedia: {
-      ogTitle: string;
-      ogDescription: string;
-      ogImage: string;
-    },
-    advanced: {
-      canonicalUrl: string;
-      structuredData: string;
-      excludeFromSearch: boolean;
-    }
-  };
-  styling: {
-    h1Color: string;
-    h2Color: string;
-    h3Color: string;
-    bodyTextColor: string;
-    backgroundColor: string;
-    primaryColor: string;
-    linkColor: string;
-    buttonColor: string;
-    buttonTextColor: string;
-    formTextColor: string;
-    headerBgColor: string;
-    headerTextColor: string;
-    headerNavTextColor: string;
-    footerBgColor: string;
-  }
-}
+import { useSettings, SiteSettings, defaultSettings } from '@/hooks/useSettings';
 
 // Define available pages for SEO settings
 const availablePages = [
@@ -63,118 +22,17 @@ const availablePages = [
   { value: "/contact", label: "Contact Page" },
 ];
 
-// Initialize with default settings or get from localStorage
-const getSettings = (): SiteSettings => {
-  const savedSettings = localStorage.getItem('site_settings');
-  if (savedSettings) {
-    try {
-      const parsed = JSON.parse(savedSettings);
-      
-      // Ensure all required pages exist in pageSeo
-      const defaultPageSeo = {
-        title: "",
-        description: "",
-        noIndex: false
-      };
-      
-      // Make sure all available pages have entries
-      availablePages.forEach(page => {
-        if (!parsed.seo.pageSeo || !parsed.seo.pageSeo[page.value]) {
-          if (!parsed.seo.pageSeo) {
-            parsed.seo.pageSeo = {};
-          }
-          parsed.seo.pageSeo[page.value] = defaultPageSeo;
-        }
-      });
-
-      // Ensure socialMedia object exists
-      if (!parsed.seo.socialMedia) {
-        parsed.seo.socialMedia = {
-          ogTitle: "",
-          ogDescription: "",
-          ogImage: ""
-        };
-      }
-
-      // Ensure advanced object exists
-      if (!parsed.seo.advanced) {
-        parsed.seo.advanced = {
-          canonicalUrl: "",
-          structuredData: '{"@context":"https://schema.org","@type":"Organization","name":"IT Carolina"}',
-          excludeFromSearch: false
-        };
-      }
-      
-      return parsed;
-    } catch (error) {
-      console.error("Error parsing saved settings:", error);
-      return getDefaultSettings();
-    }
-  }
-  return getDefaultSettings();
-};
-
-// Default settings as a separate function for clarity
-const getDefaultSettings = (): SiteSettings => {
-  // Create default pageSeo object with all available pages
-  const defaultPageSeo = {};
-  availablePages.forEach(page => {
-    defaultPageSeo[page.value] = {
-      title: page.value === "/" 
-        ? "IT Carolina - Expert On-Site IT Support in Charlotte"
-        : `${page.label.replace(" Page", "")} - IT Carolina`,
-      description: page.value === "/" 
-        ? "Professional IT support and services for businesses of all sizes in Charlotte, NC. We specialize in software troubleshooting, printer setup, and more."
-        : `Our ${page.label.toLowerCase().replace(" page", "")} page with information about IT Carolina.`,
-      noIndex: false
-    };
-  });
-
-  return {
-    seo: {
-      siteTitle: "IT Carolina - Expert On-Site IT Support in Charlotte",
-      siteDescription: "Professional IT support and services for businesses of all sizes in Charlotte, NC. We specialize in software troubleshooting, printer setup, and more.",
-      defaultKeywords: "IT support, computer repair, tech services, Charlotte, printer services",
-      pageSeo: defaultPageSeo,
-      socialMedia: {
-        ogTitle: "",
-        ogDescription: "",
-        ogImage: ""
-      },
-      advanced: {
-        canonicalUrl: "",
-        structuredData: '{"@context":"https://schema.org","@type":"Organization","name":"IT Carolina"}',
-        excludeFromSearch: false
-      }
-    },
-    styling: {
-      h1Color: "#000000",
-      h2Color: "#000000",
-      h3Color: "#000000",
-      bodyTextColor: "#000000",
-      backgroundColor: "#f6f6f7",
-      primaryColor: "#00a0c6",
-      linkColor: "#00a0c6",
-      buttonColor: "#00a0c6",
-      buttonTextColor: "#000000",
-      formTextColor: "#000000",
-      headerBgColor: "#182B3B",
-      headerTextColor: "#ffffff", 
-      headerNavTextColor: "#ffffff",
-      footerBgColor: "#f1f5f9"
-    }
-  };
-};
-
 const AdminSettings = () => {
-  const [settings, setSettings] = useState<SiteSettings>(getSettings);
+  const { settings: savedSettings, saveSettings, isLoaded } = useSettings();
+  const [settings, setSettings] = useState<SiteSettings>(defaultSettings);
   const [activeTab, setActiveTab] = useState("seo");
   const [selectedPage, setSelectedPage] = useState("/");
 
-  // Save settings to localStorage when they change
   useEffect(() => {
-    localStorage.setItem('site_settings', JSON.stringify(settings));
-  }, [settings]);
+    if (isLoaded) {
+      setSettings(savedSettings);
+    }
+  }, [savedSettings, isLoaded]);
 
   const handleSEOChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -272,34 +130,62 @@ const AdminSettings = () => {
     }));
   };
 
-  const handleSaveSettings = () => {
-    localStorage.setItem('site_settings', JSON.stringify(settings));
-    toast({
-      title: "Settings Saved",
-      description: "Your site settings have been updated",
-    });
+  const handleContactInfoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setSettings(prev => ({
+      ...prev,
+      contact: {
+        ...prev.contact,
+        [name]: value
+      }
+    }));
+  };
 
-    // Apply styling changes immediately to see the effect
-    document.documentElement.style.setProperty('--h1-color', settings.styling.h1Color);
-    document.documentElement.style.setProperty('--h2-color', settings.styling.h2Color);
-    document.documentElement.style.setProperty('--h3-color', settings.styling.h3Color);
-    document.documentElement.style.setProperty('--body-text-color', settings.styling.bodyTextColor);
-    document.documentElement.style.setProperty('--background-color', settings.styling.backgroundColor);
-    document.documentElement.style.setProperty('--primary-color', settings.styling.primaryColor);
-    document.documentElement.style.setProperty('--link-color', settings.styling.linkColor);
-    document.documentElement.style.setProperty('--button-color', settings.styling.buttonColor);
-    document.documentElement.style.setProperty('--button-text-color', settings.styling.buttonTextColor);
-    document.documentElement.style.setProperty('--form-text-color', settings.styling.formTextColor);
-    document.documentElement.style.setProperty('--header-bg-color', settings.styling.headerBgColor);
-    document.documentElement.style.setProperty('--header-text-color', settings.styling.headerTextColor);
-    document.documentElement.style.setProperty('--header-nav-text-color', settings.styling.headerNavTextColor);
-    document.documentElement.style.setProperty('--footer-bg-color', settings.styling.footerBgColor);
+  const handleBusinessHoursChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setSettings(prev => ({
+      ...prev,
+      contact: {
+        ...prev.contact,
+        businessHours: {
+          ...prev.contact.businessHours,
+          [name]: value
+        }
+      }
+    }));
+  };
+
+  const handleSaveSettings = () => {
+    const success = saveSettings(settings);
+    
+    if (success) {
+      toast({
+        title: "Settings Saved",
+        description: "Your site settings have been updated",
+      });
+    } else {
+      toast({
+        title: "Error",
+        description: "There was a problem saving your settings",
+        variant: "destructive"
+      });
+    }
   };
 
   // Add a null check before accessing settings.seo.pageSeo[selectedPage]
   const pageSeoData = selectedPage && settings?.seo?.pageSeo?.[selectedPage] ? 
     settings.seo.pageSeo[selectedPage] : 
     { title: "", description: "", noIndex: false };
+
+  if (!isLoaded) {
+    return (
+      <AdminLayout title="Settings">
+        <div className="flex items-center justify-center h-64">
+          <p>Loading settings...</p>
+        </div>
+      </AdminLayout>
+    );
+  }
 
   return (
     <AdminLayout title="Settings">
@@ -314,15 +200,21 @@ const AdminSettings = () => {
         <TabsList className="mb-8 border-b w-full justify-start rounded-none bg-transparent p-0">
           <TabsTrigger 
             value="seo"
-            className="rounded-none border-b-2 border-transparent px-4 py-2 data-[state=active]:border-itblue data-[state=active]:bg-transparent"
+            className="rounded-none border-b-2 border-transparent px-4 py-2 data-[state=active]:border-primary data-[state=active]:bg-transparent"
           >
             SEO Settings
           </TabsTrigger>
           <TabsTrigger 
             value="styling"
-            className="rounded-none border-b-2 border-transparent px-4 py-2 data-[state=active]:border-itblue data-[state=active]:bg-transparent"
+            className="rounded-none border-b-2 border-transparent px-4 py-2 data-[state=active]:border-primary data-[state=active]:bg-transparent"
           >
             Theme Settings
+          </TabsTrigger>
+          <TabsTrigger 
+            value="contact"
+            className="rounded-none border-b-2 border-transparent px-4 py-2 data-[state=active]:border-primary data-[state=active]:bg-transparent"
+          >
+            Contact Info
           </TabsTrigger>
         </TabsList>
 
@@ -945,12 +837,166 @@ const AdminSettings = () => {
             </CardContent>
           </Card>
         </TabsContent>
+
+        <TabsContent value="contact" className="mt-0 space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle>
+                <div className="flex items-center">
+                  <Phone className="mr-2 h-5 w-5" />
+                  Contact Information
+                </div>
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div>
+                <label htmlFor="phone" className="block text-sm font-medium mb-1">
+                  Phone Number
+                </label>
+                <Input 
+                  id="phone"
+                  name="phone"
+                  value={settings.contact.phone} 
+                  onChange={handleContactInfoChange}
+                  placeholder="(123) 456-7890"
+                />
+                <p className="text-xs text-gray-500 mt-1">Displayed in header, footer, and contact pages</p>
+              </div>
+              <div>
+                <label htmlFor="email" className="block text-sm font-medium mb-1">
+                  Email Address
+                </label>
+                <Input 
+                  id="email"
+                  name="email"
+                  value={settings.contact.email} 
+                  onChange={handleContactInfoChange}
+                  placeholder="info@example.com"
+                />
+              </div>
+              <div>
+                <label htmlFor="address" className="block text-sm font-medium mb-1">
+                  Address
+                </label>
+                <Input 
+                  id="address"
+                  name="address"
+                  value={settings.contact.address} 
+                  onChange={handleContactInfoChange}
+                  placeholder="123 Main St, City, State, Zip"
+                />
+              </div>
+            </CardContent>
+          </Card>
+          
+          <Card>
+            <CardHeader>
+              <CardTitle>
+                <div className="flex items-center">
+                  <Clock className="mr-2 h-5 w-5" />
+                  Business Hours
+                </div>
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label htmlFor="monday" className="block text-sm font-medium mb-1">
+                    Monday
+                  </label>
+                  <Input 
+                    id="monday"
+                    name="monday"
+                    value={settings.contact.businessHours.monday} 
+                    onChange={handleBusinessHoursChange}
+                    placeholder="9:00 AM - 5:00 PM"
+                  />
+                </div>
+                <div>
+                  <label htmlFor="tuesday" className="block text-sm font-medium mb-1">
+                    Tuesday
+                  </label>
+                  <Input 
+                    id="tuesday"
+                    name="tuesday"
+                    value={settings.contact.businessHours.tuesday} 
+                    onChange={handleBusinessHoursChange}
+                    placeholder="9:00 AM - 5:00 PM"
+                  />
+                </div>
+                <div>
+                  <label htmlFor="wednesday" className="block text-sm font-medium mb-1">
+                    Wednesday
+                  </label>
+                  <Input 
+                    id="wednesday"
+                    name="wednesday"
+                    value={settings.contact.businessHours.wednesday} 
+                    onChange={handleBusinessHoursChange}
+                    placeholder="9:00 AM - 5:00 PM"
+                  />
+                </div>
+                <div>
+                  <label htmlFor="thursday" className="block text-sm font-medium mb-1">
+                    Thursday
+                  </label>
+                  <Input 
+                    id="thursday"
+                    name="thursday"
+                    value={settings.contact.businessHours.thursday} 
+                    onChange={handleBusinessHoursChange}
+                    placeholder="9:00 AM - 5:00 PM"
+                  />
+                </div>
+                <div>
+                  <label htmlFor="friday" className="block text-sm font-medium mb-1">
+                    Friday
+                  </label>
+                  <Input 
+                    id="friday"
+                    name="friday"
+                    value={settings.contact.businessHours.friday} 
+                    onChange={handleBusinessHoursChange}
+                    placeholder="9:00 AM - 5:00 PM"
+                  />
+                </div>
+                <div>
+                  <label htmlFor="saturday" className="block text-sm font-medium mb-1">
+                    Saturday
+                  </label>
+                  <Input 
+                    id="saturday"
+                    name="saturday"
+                    value={settings.contact.businessHours.saturday} 
+                    onChange={handleBusinessHoursChange}
+                    placeholder="10:00 AM - 2:00 PM"
+                  />
+                </div>
+                <div>
+                  <label htmlFor="sunday" className="block text-sm font-medium mb-1">
+                    Sunday
+                  </label>
+                  <Input 
+                    id="sunday"
+                    name="sunday"
+                    value={settings.contact.businessHours.sunday} 
+                    onChange={handleBusinessHoursChange}
+                    placeholder="Closed"
+                  />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
       </Tabs>
 
       <div className="mt-8 flex justify-end">
         <Button 
           onClick={handleSaveSettings} 
-          className="bg-itblue hover:bg-itblue-dark"
+          style={{
+            backgroundColor: settings.styling.buttonColor,
+            color: settings.styling.buttonTextColor
+          }}
         >
           Save Settings
         </Button>

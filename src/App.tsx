@@ -1,11 +1,12 @@
 
-import React, { useEffect } from "react";
+import React from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AdminAuthProvider } from "@/contexts/AdminAuthContext";
+import SiteHead from "@/components/SiteHead";
 import Index from "./pages/Index";
 import Services from "./pages/Services";
 import Printers from "./pages/Printers";
@@ -23,102 +24,11 @@ import AdminDashboard from "./pages/admin/AdminDashboard";
 import AdminServices from "./pages/admin/AdminServices";
 import AdminBlog from "./pages/admin/AdminBlog";
 import AdminSettings from "./pages/admin/AdminSettings";
+import AdminMessages from "./pages/admin/AdminMessages";
 
 const queryClient = new QueryClient();
 
-// Function to apply theme settings from localStorage
-const applyThemeSettings = () => {
-  try {
-    // Default theme values matching the image
-    const defaultSettings = {
-      styling: {
-        h1Color: "#000000",
-        h2Color: "#000000",
-        h3Color: "#000000",
-        bodyTextColor: "#000000",
-        backgroundColor: "#f6f6f7",
-        primaryColor: "#00a0c6",
-        linkColor: "#00a0c6",
-        buttonColor: "#00a0c6",
-        buttonTextColor: "#ffffff", // Changed to white for better contrast
-        formTextColor: "#000000",
-        headerBgColor: "#182B3B",
-        headerTextColor: "#ffffff", 
-        headerNavTextColor: "#ffffff",
-        footerBgColor: "#f1f5f9"
-      }
-    };
-    
-    const savedSettings = localStorage.getItem('site_settings');
-    const settings = savedSettings ? JSON.parse(savedSettings) : defaultSettings;
-      
-    if (settings?.styling) {
-      const styling = settings.styling;
-      
-      // Apply all styling variables to CSS root
-      document.documentElement.style.setProperty('--h1-color', styling.h1Color || '#000000');
-      document.documentElement.style.setProperty('--h2-color', styling.h2Color || '#000000');
-      document.documentElement.style.setProperty('--h3-color', styling.h3Color || '#000000');
-      document.documentElement.style.setProperty('--body-text-color', styling.bodyTextColor || '#000000');
-      document.documentElement.style.setProperty('--background-color', styling.backgroundColor || '#f6f6f7');
-      document.documentElement.style.setProperty('--primary-color', styling.primaryColor || '#00a0c6');
-      document.documentElement.style.setProperty('--link-color', styling.linkColor || '#00a0c6');
-      document.documentElement.style.setProperty('--button-color', styling.buttonColor || '#00a0c6');
-      document.documentElement.style.setProperty('--button-text-color', styling.buttonTextColor || '#ffffff');
-      document.documentElement.style.setProperty('--form-text-color', styling.formTextColor || '#000000');
-      document.documentElement.style.setProperty('--header-bg-color', styling.headerBgColor || '#182B3B');
-      document.documentElement.style.setProperty('--header-text-color', styling.headerTextColor || '#ffffff');
-      document.documentElement.style.setProperty('--header-nav-text-color', styling.headerNavTextColor || '#ffffff');
-      document.documentElement.style.setProperty('--footer-bg-color', styling.footerBgColor || '#f1f5f9');
-    } else {
-      // If no styling found in localStorage, apply defaults
-      applyDefaultThemeSettings();
-    }
-    
-    // Apply the theme settings immediately to all elements that should use them
-    document.body.style.backgroundColor = getComputedStyle(document.documentElement).getPropertyValue('--background-color').trim();
-  } catch (error) {
-    console.error("Error applying theme settings:", error);
-    // Apply defaults if there's an error
-    applyDefaultThemeSettings();
-  }
-};
-
-// Function to apply default theme settings
-const applyDefaultThemeSettings = () => {
-  document.documentElement.style.setProperty('--h1-color', '#000000');
-  document.documentElement.style.setProperty('--h2-color', '#000000');
-  document.documentElement.style.setProperty('--h3-color', '#000000');
-  document.documentElement.style.setProperty('--body-text-color', '#000000');
-  document.documentElement.style.setProperty('--background-color', '#f6f6f7');
-  document.documentElement.style.setProperty('--primary-color', '#00a0c6');
-  document.documentElement.style.setProperty('--link-color', '#00a0c6');
-  document.documentElement.style.setProperty('--button-color', '#00a0c6');
-  document.documentElement.style.setProperty('--button-text-color', '#ffffff');
-  document.documentElement.style.setProperty('--form-text-color', '#000000');
-  document.documentElement.style.setProperty('--header-bg-color', '#182B3B');
-  document.documentElement.style.setProperty('--header-text-color', '#ffffff');
-  document.documentElement.style.setProperty('--header-nav-text-color', '#ffffff');
-  document.documentElement.style.setProperty('--footer-bg-color', '#f1f5f9');
-};
-
 const App = () => {
-  // Apply theme settings when the app loads and whenever the component rerenders
-  useEffect(() => {
-    applyThemeSettings();
-    
-    // Set up an event listener to detect when localStorage changes
-    const handleStorageChange = () => {
-      applyThemeSettings();
-    };
-    
-    window.addEventListener('storage', handleStorageChange);
-    
-    return () => {
-      window.removeEventListener('storage', handleStorageChange);
-    };
-  }, []);
-
   // Create a layout component to avoid repetition
   const Layout = ({ children }: { children: React.ReactNode }) => (
     <div className="flex min-h-screen flex-col">
@@ -136,6 +46,9 @@ const App = () => {
             <Toaster />
             <Sonner />
             <BrowserRouter>
+              {/* SiteHead handles SEO and theme settings */}
+              <SiteHead />
+              
               <Routes>
                 {/* Admin Routes */}
                 <Route path="/admin" element={<AdminLogin />} />
@@ -143,6 +56,7 @@ const App = () => {
                 <Route path="/admin/services" element={<AdminServices />} />
                 <Route path="/admin/blog" element={<AdminBlog />} />
                 <Route path="/admin/settings" element={<AdminSettings />} />
+                <Route path="/admin/messages" element={<AdminMessages />} />
                 
                 {/* Public Routes */}
                 <Route path="/" element={

@@ -4,9 +4,12 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/components/ui/use-toast';
+import { saveContactSubmission } from '@/utils/contactSubmissions';
+import { useSettings } from '@/hooks/useSettings';
 
 const ContactForm = () => {
   const { toast } = useToast();
+  const { settings } = useSettings();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
@@ -24,9 +27,15 @@ const ContactForm = () => {
     e.preventDefault();
     setIsSubmitting(true);
     
-    // Simulate form submission
-    setTimeout(() => {
-      setIsSubmitting(false);
+    // Save the submission
+    const success = saveContactSubmission({
+      name: formData.name,
+      email: formData.email,
+      phone: formData.phone,
+      message: formData.message
+    });
+    
+    if (success) {
       toast({
         title: "Message sent!",
         description: "We'll get back to you as soon as possible.",
@@ -39,7 +48,15 @@ const ContactForm = () => {
         phone: '',
         message: '',
       });
-    }, 1000);
+    } else {
+      toast({
+        title: "Error",
+        description: "There was a problem sending your message. Please try again later.",
+        variant: "destructive",
+      });
+    }
+    
+    setIsSubmitting(false);
   };
 
   return (
@@ -53,6 +70,7 @@ const ContactForm = () => {
           onChange={handleChange}
           required
           className="w-full"
+          style={{ color: `var(--form-text-color)` }}
         />
       </div>
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
@@ -64,6 +82,7 @@ const ContactForm = () => {
           onChange={handleChange}
           required
           className="w-full"
+          style={{ color: `var(--form-text-color)` }}
         />
         <Input
           type="tel"
@@ -72,6 +91,7 @@ const ContactForm = () => {
           value={formData.phone}
           onChange={handleChange}
           className="w-full"
+          style={{ color: `var(--form-text-color)` }}
         />
       </div>
       <div>
@@ -83,11 +103,16 @@ const ContactForm = () => {
           rows={5}
           required
           className="w-full"
+          style={{ color: `var(--form-text-color)` }}
         />
       </div>
       <Button 
         type="submit" 
-        className="w-full bg-itblue hover:bg-itblue-dark"
+        className="w-full"
+        style={{
+          backgroundColor: `var(--button-color)`,
+          color: `var(--button-text-color)`
+        }}
         disabled={isSubmitting}
       >
         {isSubmitting ? 'Sending...' : 'Send Message'}

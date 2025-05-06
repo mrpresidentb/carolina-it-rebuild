@@ -4,8 +4,11 @@ import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import ContactForm from '@/components/ContactForm';
 import { Computer, Printer, Globe, Bug } from 'lucide-react';
+import { useSettings } from '@/hooks/useSettings';
 
 const Index = () => {
+  const { settings } = useSettings();
+  
   return (
     <main>
       {/* Hero Section */}
@@ -20,7 +23,10 @@ const Index = () => {
                 IT Carolina provides professional IT services to small businesses and individuals throughout the Charlotte area.
               </p>
               <div className="flex flex-wrap gap-4">
-                <Button asChild className="bg-itblue hover:bg-itblue-dark">
+                <Button asChild style={{
+                  backgroundColor: 'var(--button-color)',
+                  color: 'var(--button-text-color)'
+                }}>
                   <Link to="/contact">Get Support</Link>
                 </Button>
                 <Button asChild variant="outline">
@@ -92,7 +98,10 @@ const Index = () => {
           </div>
           
           <div className="mt-10 text-center">
-            <Button asChild className="bg-itblue hover:bg-itblue-dark">
+            <Button asChild style={{
+              backgroundColor: 'var(--button-color)',
+              color: 'var(--button-text-color)'
+            }}>
               <Link to="/services">View All Services</Link>
             </Button>
           </div>
@@ -162,7 +171,7 @@ const Index = () => {
                   </div>
                   <div>
                     <p className="text-sm text-gray-500">Phone</p>
-                    <a href="tel:+17043185006" className="text-lg font-medium hover:text-itblue">(704) 318-5006</a>
+                    <a href={`tel:${settings.contact.phone}`} className="text-lg font-medium hover:text-itblue">{settings.contact.phone}</a>
                   </div>
                 </div>
                 
@@ -174,7 +183,7 @@ const Index = () => {
                   </div>
                   <div>
                     <p className="text-sm text-gray-500">Email</p>
-                    <a href="mailto:info@itcarolina.us" className="text-lg font-medium hover:text-itblue">info@itcarolina.us</a>
+                    <a href={`mailto:${settings.contact.email}`} className="text-lg font-medium hover:text-itblue">{settings.contact.email}</a>
                   </div>
                 </div>
                 
@@ -187,7 +196,7 @@ const Index = () => {
                   </div>
                   <div>
                     <p className="text-sm text-gray-500">Location</p>
-                    <p className="text-lg font-medium">Charlotte, NC</p>
+                    <p className="text-lg font-medium">{settings.contact.address}</p>
                   </div>
                 </div>
               </div>

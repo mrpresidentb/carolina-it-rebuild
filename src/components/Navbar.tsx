@@ -1,19 +1,16 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Menu, X } from 'lucide-react';
 import { getVisibleServices } from '@/utils/services';
 import { Service } from '@/models/Service';
+import { useSettings } from '@/hooks/useSettings';
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [services, setServices] = useState<Service[]>([]);
-
-  useEffect(() => {
-    // Get visible services for the navigation
-    setServices(getVisibleServices());
-  }, []);
+  const { settings } = useSettings();
+  const services = getVisibleServices();
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
@@ -82,7 +79,6 @@ const Navbar = () => {
         <div className="hidden md:flex">
           <Button 
             asChild 
-            className="hover:opacity-90"
             style={{
               backgroundColor: `var(--button-color, #00a0c6)`,
               color: `var(--button-text-color, #ffffff)`
@@ -159,7 +155,7 @@ const Navbar = () => {
             </Link>
             <Button 
               asChild 
-              className="mt-4 w-full hover:opacity-90"
+              className="mt-4 w-full"
               style={{
                 backgroundColor: `var(--button-color, #00a0c6)`,
                 color: `var(--button-text-color, #ffffff)`

@@ -1,17 +1,14 @@
 
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { Link } from 'react-router-dom';
 import { getVisibleServices } from '@/utils/services';
 import { Service } from '@/models/Service';
+import { useSettings } from '@/hooks/useSettings';
 
 const Footer = () => {
-  const [services, setServices] = useState<Service[]>([]);
+  const { settings } = useSettings();
+  const services = getVisibleServices();
   const currentYear = new Date().getFullYear();
-  
-  useEffect(() => {
-    // Get visible services for the footer
-    setServices(getVisibleServices());
-  }, []);
   
   return (
     <footer className="bg-gray-100" style={{ backgroundColor: 'var(--footer-bg-color, #f1f5f9)' }}>
@@ -24,13 +21,13 @@ const Footer = () => {
           
           <div className="flex flex-col items-center space-y-2">
             <p className="text-sm">
-              <a href="tel:+18886610020" className="hover:text-itblue">888 (661) 0020</a>
+              <a href={`tel:${settings.contact.phone}`} className="hover:text-itblue">{settings.contact.phone}</a>
             </p>
             <p className="text-sm">
-              <a href="mailto:support@itcarolina.us" className="hover:text-itblue">support@itcarolina.us</a>
+              <a href={`mailto:${settings.contact.email}`} className="hover:text-itblue">{settings.contact.email}</a>
             </p>
             <p className="text-sm text-center">
-              3540 Toringdon Way, Suite 200, Charlotte, NC 28277
+              {settings.contact.address}
             </p>
           </div>
           
