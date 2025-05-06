@@ -7,4 +7,5 @@ export interface ContactFormSubmission {
   message: string;
   date: string;
   isRead: boolean;
+  priority?: 'low' | 'medium' | 'high';
 }

@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { LayoutDashboard, Settings, FileText, Layers, Mail } from 'lucide-react';
@@ -8,7 +8,22 @@ import { Badge } from '@/components/ui/badge';
 
 const AdminNav = () => {
   const location = useLocation();
-  const unreadMessagesCount = getContactSubmissions().filter(msg => !msg.isRead).length;
+  const [unreadMessagesCount, setUnreadMessagesCount] = useState(0);
+  
+  // Update unread messages count on component mount and location change
+  useEffect(() => {
+    const updateUnreadCount = () => {
+      const count = getContactSubmissions().filter(msg => !msg.isRead).length;
+      setUnreadMessagesCount(count);
+    };
+    
+    updateUnreadCount();
+    
+    // Set up interval to check for new messages every 10 seconds
+    const intervalId = setInterval(updateUnreadCount, 10000);
+    
+    return () => clearInterval(intervalId);
+  }, [location]);
 
   const navItems = [
     {

@@ -23,11 +23,13 @@ export const saveContactSubmission = (submission: Omit<ContactFormSubmission, 'i
       ...submission,
       id: generateId(),
       date: new Date().toISOString(),
-      isRead: false
+      isRead: false,
+      priority: 'medium'
     };
     
-    submissions.unshift(newSubmission); // Add to beginning of array
-    localStorage.setItem('contact_submissions', JSON.stringify(submissions));
+    // Add to beginning of array for newest first
+    const updatedSubmissions = [newSubmission, ...submissions];
+    localStorage.setItem('contact_submissions', JSON.stringify(updatedSubmissions));
     
     return true;
   } catch (error) {
@@ -62,6 +64,22 @@ export const deleteContactSubmission = (id: string): boolean => {
     return true;
   } catch (error) {
     console.error("Error deleting contact submission:", error);
+    return false;
+  }
+};
+
+// Update submission priority
+export const updateSubmissionPriority = (id: string, priority: 'low' | 'medium' | 'high'): boolean => {
+  try {
+    const submissions = getContactSubmissions();
+    const updatedSubmissions = submissions.map(submission => 
+      submission.id === id ? { ...submission, priority } : submission
+    );
+    
+    localStorage.setItem('contact_submissions', JSON.stringify(updatedSubmissions));
+    return true;
+  } catch (error) {
+    console.error("Error updating submission priority:", error);
     return false;
   }
 };
