@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
@@ -28,9 +27,17 @@ import AdminMessages from "./pages/admin/AdminMessages";
 
 const queryClient = new QueryClient();
 
-const App = () => {
+function App() {
   // Create a layout component to avoid repetition
   const Layout = ({ children }: { children: React.ReactNode }) => (
+    <div className="flex min-h-screen flex-col">
+      <Navbar />
+      <div className="flex-1">{children}</div>
+      <Footer />
+    </div>
+  );
+
+  const AdminLayout = ({ children }: { children: React.ReactNode }) => (
     <div className="flex min-h-screen flex-col">
       <Navbar />
       <div className="flex-1">{children}</div>
@@ -51,55 +58,27 @@ const App = () => {
               
               <Routes>
                 {/* Admin Routes */}
-                <Route path="/admin" element={<AdminLogin />} />
-                <Route path="/admin/dashboard" element={<AdminDashboard />} />
-                <Route path="/admin/services" element={<AdminServices />} />
-                <Route path="/admin/blog" element={<AdminBlog />} />
-                <Route path="/admin/settings" element={<AdminSettings />} />
-                <Route path="/admin/messages" element={<AdminMessages />} />
+                <Route path="/admin" element={<AdminLayout />}>
+                  <Route path="dashboard" element={<AdminDashboard />} />
+                  <Route path="services" element={<AdminServices />} />
+                  <Route path="blog" element={<AdminBlog />} />
+                  <Route path="images" element={<AdminImages />} />
+                  <Route path="messages" element={<AdminMessages />} />
+                  <Route path="settings" element={<AdminSettings />} />
+                </Route>
+                <Route path="/admin/login" element={<AdminLogin />} />
                 
                 {/* Public Routes */}
-                <Route path="/" element={
-                  <Layout>
-                    <Index />
-                  </Layout>
-                } />
-                <Route path="/services" element={
-                  <Layout>
-                    <Services />
-                  </Layout>
-                } />
-                <Route path="/printers" element={
-                  <Layout>
-                    <Printers />
-                  </Layout>
-                } />
-                <Route path="/contact" element={
-                  <Layout>
-                    <Contact />
-                  </Layout>
-                } />
-                <Route path="/blog" element={
-                  <Layout>
-                    <Blog />
-                  </Layout>
-                } />
-                <Route path="/blog/:id" element={
-                  <Layout>
-                    <BlogPost />
-                  </Layout>
-                } />
-                {/* Dynamic Service Pages */}
-                <Route path="/services/:slug" element={
-                  <Layout>
-                    <ServicePage />
-                  </Layout>
-                } />
-                <Route path="*" element={
-                  <Layout>
-                    <NotFound />
-                  </Layout>
-                } />
+                <Route path="/" element={<Layout />}>
+                  <Route index element={<Index />} />
+                  <Route path="services" element={<Services />} />
+                  <Route path="services/:id" element={<ServicePage />} />
+                  <Route path="contact" element={<Contact />} />
+                  <Route path="blog" element={<Blog />} />
+                  <Route path="blog/:id" element={<BlogPost />} />
+                  <Route path="printers" element={<Printers />} />
+                  <Route path="*" element={<NotFound />} />
+                </Route>
               </Routes>
             </BrowserRouter>
           </TooltipProvider>

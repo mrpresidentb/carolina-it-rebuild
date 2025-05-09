@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { cn } from '@/lib/utils';
-import { LayoutDashboard, Settings, FileText, Layers, Mail } from 'lucide-react';
+import { LayoutDashboard, Settings, FileText, Layers, Mail, Image } from 'lucide-react';
 import { getContactSubmissions } from '@/utils/contactSubmissions';
 import { Badge } from '@/components/ui/badge';
 
@@ -40,6 +40,11 @@ const AdminNav = () => {
       href: '/admin/blog',
       label: 'Blog',
       icon: <FileText className="mr-2 h-4 w-4" />,
+    },
+    {
+      href: '/admin/images',
+      label: 'Images',
+      icon: <Image className="mr-2 h-4 w-4" />,
     },
     {
       href: '/admin/messages',

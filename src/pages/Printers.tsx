@@ -3,6 +3,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Printer, Settings, Mail, Wrench } from 'lucide-react';
+import OptimizedImage from '@/components/OptimizedImage';
 
 const Printers = () => {
   return (
@@ -10,9 +11,10 @@ const Printers = () => {
       {/* Hero Section */}
       <section className="relative">
         <div className="absolute inset-0 z-0">
-          <img
-            src="https://images.squarespace-cdn.com/content/v1/65ceda6257234b70b68cc0fb/1715024886621-TB1TAZGR9500YFCK67WN/image-asset.jpeg"
-            alt="Printer Services"
+          <OptimizedImage
+            location="printer-services-hero"
+            fallbackSrc="https://images.squarespace-cdn.com/content/v1/65ceda6257234b70b68cc0fb/1715024886621-TB1TAZGR9500YFCK67WN/image-asset.jpeg"
+            fallbackAlt="Printer Services"
             className="w-full h-full object-cover brightness-50"
           />
         </div>

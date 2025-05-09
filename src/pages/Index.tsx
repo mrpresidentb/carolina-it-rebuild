@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import ContactForm from '@/components/ContactForm';
 import { Computer, Printer, Globe, Bug } from 'lucide-react';
 import { useSettings } from '@/hooks/useSettings';
+import OptimizedImage from '@/components/OptimizedImage';
 
 const Index = () => {
   const { settings } = useSettings();
@@ -35,9 +36,10 @@ const Index = () => {
               </div>
             </div>
             <div className="order-first md:order-last">
-              <img
-                src="https://images.squarespace-cdn.com/content/v1/65ceda6257234b70b68cc0fb/1714350468323-H9LLYACENDR9ZPCAOP0G/image-asset.jpeg"
-                alt="IT Support Services"
+              <OptimizedImage
+                location="homepage-hero"
+                fallbackSrc="https://images.squarespace-cdn.com/content/v1/65ceda6257234b70b68cc0fb/1714350468323-H9LLYACENDR9ZPCAOP0G/image-asset.jpeg"
+                fallbackAlt="IT Support Services"
                 className="w-full h-auto rounded-lg shadow-lg"
               />
             </div>
