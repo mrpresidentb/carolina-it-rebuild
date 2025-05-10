@@ -37,7 +37,7 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({ onImageSelected, currentU
     reader.onload = (event) => {
       const result = event.target?.result as string;
       setPreviewUrl(result);
-      onImageSelected(result, file);
+      onImageSelected(result, file); // Pass both the data URL and the file
     };
     reader.readAsDataURL(file);
   };
@@ -46,7 +46,7 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({ onImageSelected, currentU
     const url = e.target.value;
     setPreviewUrl(url);
     setImageFile(null);
-    onImageSelected(url);
+    onImageSelected(url); // Only pass URL for external images
   };
 
   return (

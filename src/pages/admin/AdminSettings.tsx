@@ -6,14 +6,16 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { toast } from '@/hooks/use-toast';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Palette, Heading, Image, Settings, Link as LinkIcon, Phone, Mail, MapPin, Clock } from 'lucide-react';
+import { Palette, Heading, Image, Settings, Link as LinkIcon, Phone, Mail, MapPin, Clock, FileText } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 import { useSettings, SiteSettings, defaultSettings } from '@/hooks/useSettings';
 import { useWebsiteImages } from '@/hooks/useWebsiteImages';
+import { useContentPages } from '@/hooks/useContentPages';
 import ImageUploader from '@/components/admin/ImageUploader';
 import { WebsiteImage } from '@/models/WebsiteImage';
+import ContentEditor from '@/components/admin/ContentEditor';
 
 // Define available pages for SEO settings
 const availablePages = [
@@ -27,16 +29,19 @@ const availablePages = [
 const AdminSettings = () => {
   const { settings: savedSettings, saveSettings, isLoaded } = useSettings();
   const { images, updateImage, addImage, getImageForLocation } = useWebsiteImages();
+  const { pages, updateContentPage, isLoaded: contentPagesLoaded } = useContentPages();
   const [settings, setSettings] = useState<SiteSettings>(defaultSettings);
   const [activeTab, setActiveTab] = useState("seo");
   const [selectedPage, setSelectedPage] = useState("/");
   const [selectedImageLocation, setSelectedImageLocation] = useState("homepage-hero");
   const [imageBeingEdited, setImageBeingEdited] = useState<WebsiteImage | null>(null);
+  const [selectedContentPage, setSelectedContentPage] = useState("privacy-policy");
   const [newImageData, setNewImageData] = useState({
     name: '',
     url: '',
     alt: '',
     location: '',
+    isUploaded: false,
     seo: {
       title: '',
       description: '',
@@ -71,6 +76,7 @@ const AdminSettings = () => {
         url: currentImage.url,
         alt: currentImage.alt || '',
         location: currentImage.location,
+        isUploaded: !!currentImage.isUploaded,
         seo: {
           title: currentImage.seo?.title || '',
           description: currentImage.seo?.description || '',
@@ -83,6 +89,7 @@ const AdminSettings = () => {
         url: '',
         alt: '',
         location: selectedImageLocation,
+        isUploaded: false,
         seo: {
           title: '',
           description: '',
@@ -121,10 +128,11 @@ const AdminSettings = () => {
   };
 
   // Handle image upload
-  const handleImageSelected = (imageUrl: string) => {
+  const handleImageSelected = (imageUrl: string, imageFile?: File) => {
     setNewImageData(prev => ({
       ...prev,
-      url: imageUrl
+      url: imageUrl,
+      isUploaded: !!imageFile
     }));
   };
 
@@ -147,6 +155,7 @@ const AdminSettings = () => {
         url: newImageData.url,
         alt: newImageData.alt,
         location: newImageData.location,
+        isUploaded: newImageData.isUploaded,
         seo: newImageData.seo
       };
       
@@ -182,6 +191,23 @@ const AdminSettings = () => {
           variant: "destructive"
         });
       }
+    }
+  };
+
+  // Handle content page save
+  const handleSaveContentPage = (page) => {
+    const success = updateContentPage(page);
+    if (success) {
+      toast({
+        title: "Page Updated",
+        description: `${page.title} has been updated successfully`,
+      });
+    } else {
+      toast({
+        title: "Error",
+        description: "Failed to update page",
+        variant: "destructive"
+      });
     }
   };
 
@@ -329,7 +355,10 @@ const AdminSettings = () => {
     settings.seo.pageSeo[selectedPage] : 
     { title: "", description: "", noIndex: false };
 
-  if (!isLoaded) {
+  // Find the currently selected content page
+  const currentContentPage = pages.find(page => page.id === selectedContentPage);
+
+  if (!isLoaded || !contentPagesLoaded) {
     return (
       <AdminLayout title="Settings">
         <div className="flex items-center justify-center h-64">
@@ -373,6 +402,12 @@ const AdminSettings = () => {
             className="rounded-none border-b-2 border-transparent px-4 py-2 data-[state=active]:border-primary data-[state=active]:bg-transparent"
           >
             Contact Info
+          </TabsTrigger>
+          <TabsTrigger 
+            value="legal"
+            className="rounded-none border-b-2 border-transparent px-4 py-2 data-[state=active]:border-primary data-[state=active]:bg-transparent"
+          >
+            Legal Pages
           </TabsTrigger>
         </TabsList>
 
@@ -1330,6 +1365,57 @@ const AdminSettings = () => {
                     onChange={handleBusinessHoursChange}
                     placeholder="Closed"
                   />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="legal" className="mt-0 space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle>
+                <div className="flex items-center">
+                  <FileText className="mr-2 h-5 w-5" />
+                  Legal Pages
+                </div>
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div className="flex space-x-6">
+                {/* Page selector sidebar */}
+                <div className="w-1/4 border-r pr-4">
+                  <h3 className="font-medium mb-3">Select Page</h3>
+                  <div className="flex flex-col space-y-2">
+                    <Button 
+                      variant={selectedContentPage === "privacy-policy" ? "secondary" : "ghost"}
+                      className="justify-start"
+                      onClick={() => setSelectedContentPage("privacy-policy")}
+                    >
+                      Privacy Policy
+                    </Button>
+                    <Button 
+                      variant={selectedContentPage === "terms-of-use" ? "secondary" : "ghost"}
+                      className="justify-start"
+                      onClick={() => setSelectedContentPage("terms-of-use")}
+                    >
+                      Terms of Use
+                    </Button>
+                  </div>
+                </div>
+
+                {/* Content editor */}
+                <div className="flex-1">
+                  {currentContentPage ? (
+                    <ContentEditor 
+                      page={currentContentPage} 
+                      onSave={handleSaveContentPage}
+                    />
+                  ) : (
+                    <div className="flex items-center justify-center h-64 bg-gray-50 rounded-md border">
+                      <p className="text-muted-foreground">Select a page to edit</p>
+                    </div>
+                  )}
                 </div>
               </div>
             </CardContent>

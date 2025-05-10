@@ -22,8 +22,9 @@ export const useWebsiteImages = () => {
   // Update an image
   const updateImage = (image: WebsiteImage) => {
     try {
-      // Make sure we have a URL even if it's from an uploaded file
-      if (!image.url && image.isUploaded) {
+      // Make sure we have a URL
+      if (!image.url) {
+        console.error("Cannot save image without URL");
         return false;
       }
 
@@ -42,10 +43,13 @@ export const useWebsiteImages = () => {
   // Add a new image
   const addImage = (image: Omit<WebsiteImage, 'id'>) => {
     try {
-      // Make sure we have a URL even if it's from an uploaded file
+      // Make sure we have a URL
       if (!image.url) {
+        console.error("Cannot add image without URL");
         return null;
       }
+      
+      console.log("Adding new image in hook:", image.name, "URL length:", image.url.length);
       
       const newImage = {
         ...image,

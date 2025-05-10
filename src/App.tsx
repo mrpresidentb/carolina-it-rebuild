@@ -1,89 +1,83 @@
+import React from 'react';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import Index from './pages';
+import Services from './pages/Services';
+import ServicePage from './pages/ServicePage';
+import Printers from './pages/Printers';
+import Blog from './pages/Blog';
+import BlogPost from './pages/BlogPost';
+import Contact from './pages/Contact';
+import NotFound from './pages/NotFound';
+import AdminDashboard from './pages/admin/AdminDashboard';
+import AdminServices from './pages/admin/AdminServices';
+import AdminBlog from './pages/admin/AdminBlog';
+import AdminMessages from './pages/admin/AdminMessages';
+import AdminSettings from './pages/admin/AdminSettings';
+import AdminImages from './pages/admin/AdminImages';
+import AdminLogin from './pages/admin/AdminLogin';
+import { useAuth } from './hooks/useAuth';
+import PrivacyPolicy from './pages/PrivacyPolicy';
+import TermsOfUse from './pages/TermsOfUse';
 
-import React from "react";
-import { Toaster } from "@/components/ui/toaster";
-import { Toaster as Sonner } from "@/components/ui/sonner";
-import { TooltipProvider } from "@/components/ui/tooltip";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { AdminAuthProvider } from "@/contexts/AdminAuthContext";
-import SiteHead from "@/components/SiteHead";
-import Index from "./pages/Index";
-import Services from "./pages/Services";
-import Printers from "./pages/Printers";
-import Contact from "./pages/Contact";
-import Blog from "./pages/Blog";
-import BlogPost from "./pages/BlogPost";
-import NotFound from "./pages/NotFound";
-import Navbar from "./components/Navbar";
-import Footer from "./components/Footer";
-import ServicePage from "./pages/ServicePage";
+const App = () => {
+  const { isLoggedIn } = useAuth();
 
-// Admin Pages
-import AdminLogin from "./pages/admin/AdminLogin";
-import AdminDashboard from "./pages/admin/AdminDashboard";
-import AdminServices from "./pages/admin/AdminServices";
-import AdminBlog from "./pages/admin/AdminBlog";
-import AdminSettings from "./pages/admin/AdminSettings";
-import AdminMessages from "./pages/admin/AdminMessages";
-import AdminImages from "./pages/admin/AdminImages";
+  const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
+    if (!isLoggedIn()) {
+      return <Navigate to="/admin/login" />;
+    }
 
-const queryClient = new QueryClient();
-
-function App() {
-  // Create a layout component to avoid repetition
-  const Layout = ({ children }: { children: React.ReactNode }) => (
-    <div className="flex min-h-screen flex-col">
-      <Navbar />
-      <div className="flex-1">{children}</div>
-      <Footer />
-    </div>
-  );
-
-  const AdminLayout = ({ children }: { children: React.ReactNode }) => (
-    <div className="flex min-h-screen flex-col">
-      <Navbar />
-      <div className="flex-1">{children}</div>
-      <Footer />
-    </div>
-  );
-
+    return <>{children}</>;
+  };
+  
   return (
-    <React.StrictMode>
-      <QueryClientProvider client={queryClient}>
-        <AdminAuthProvider>
-          <TooltipProvider>
-            <Toaster />
-            <Sonner />
-            <BrowserRouter>
-              {/* SiteHead handles SEO and theme settings */}
-              <SiteHead />
-              
-              <Routes>
-                {/* Admin Routes */}
-                <Route path="/admin" element={<AdminLayout><AdminDashboard /></AdminLayout>} />
-                <Route path="/admin/dashboard" element={<AdminLayout><AdminDashboard /></AdminLayout>} />
-                <Route path="/admin/services" element={<AdminLayout><AdminServices /></AdminLayout>} />
-                <Route path="/admin/blog" element={<AdminLayout><AdminBlog /></AdminLayout>} />
-                <Route path="/admin/images" element={<AdminLayout><AdminImages /></AdminLayout>} />
-                <Route path="/admin/messages" element={<AdminLayout><AdminMessages /></AdminLayout>} />
-                <Route path="/admin/settings" element={<AdminLayout><AdminSettings /></AdminLayout>} />
-                <Route path="/admin/login" element={<AdminLogin />} />
-                
-                {/* Public Routes */}
-                <Route path="/" element={<Layout><Index /></Layout>} />
-                <Route path="/services" element={<Layout><Services /></Layout>} />
-                <Route path="/services/:id" element={<Layout><ServicePage /></Layout>} />
-                <Route path="/contact" element={<Layout><Contact /></Layout>} />
-                <Route path="/blog" element={<Layout><Blog /></Layout>} />
-                <Route path="/blog/:id" element={<Layout><BlogPost /></Layout>} />
-                <Route path="/printers" element={<Layout><Printers /></Layout>} />
-                <Route path="*" element={<Layout><NotFound /></Layout>} />
-              </Routes>
-            </BrowserRouter>
-          </TooltipProvider>
-        </AdminAuthProvider>
-      </QueryClientProvider>
-    </React.StrictMode>
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<Index />} />
+        <Route path="/services" element={<Services />} />
+        <Route path="/service/:serviceId" element={<ServicePage />} />
+        <Route path="/printers" element={<Printers />} />
+        <Route path="/blog" element={<Blog />} />
+        <Route path="/blog/:postId" element={<BlogPost />} />
+        <Route path="/contact" element={<Contact />} />
+        <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+        <Route path="/terms-of-use" element={<TermsOfUse />} />
+        <Route path="*" element={<NotFound />} />
+        
+        {/* Admin Routes */}
+        <Route path="/admin" element={
+          <ProtectedRoute>
+            <AdminDashboard />
+          </ProtectedRoute>
+        } />
+        <Route path="/admin/services" element={
+          <ProtectedRoute>
+            <AdminServices />
+          </ProtectedRoute>
+        } />
+        <Route path="/admin/blog" element={
+          <ProtectedRoute>
+            <AdminBlog />
+          </ProtectedRoute>
+        } />
+        <Route path="/admin/messages" element={
+          <ProtectedRoute>
+            <AdminMessages />
+          </ProtectedRoute>
+        } />
+        <Route path="/admin/settings" element={
+          <ProtectedRoute>
+            <AdminSettings />
+          </ProtectedRoute>
+        } />
+        <Route path="/admin/images" element={
+          <ProtectedRoute>
+            <AdminImages />
+          </ProtectedRoute>
+        } />
+        <Route path="/admin/login" element={<AdminLogin />} />
+      </Routes>
+    </BrowserRouter>
   );
 };
 

@@ -22,6 +22,7 @@ const AdminImages = () => {
     url: '',
     alt: '',
     location: '',
+    isUploaded: false,
     seo: {
       title: '',
       description: '',
@@ -39,11 +40,13 @@ const AdminImages = () => {
   });
 
   const handleImageSelected = (imageUrl: string, imageFile?: File) => {
+    // Set isUploaded flag based on whether a file was provided
     setNewImage({ 
       ...newImage, 
       url: imageUrl,
       isUploaded: !!imageFile 
     });
+    console.log("Image selected:", imageUrl.substring(0, 50) + "...", "Is file upload:", !!imageFile);
   };
 
   const handleAddImage = () => {
@@ -55,6 +58,13 @@ const AdminImages = () => {
       });
       return;
     }
+
+    console.log("Adding image with data:", {
+      name: newImage.name,
+      location: newImage.location,
+      isUploaded: newImage.isUploaded,
+      urlLength: newImage.url?.length || 0
+    });
 
     const success = addImage(newImage as Omit<WebsiteImage, 'id'>);
     if (success) {
@@ -68,6 +78,7 @@ const AdminImages = () => {
         url: '',
         alt: '',
         location: '',
+        isUploaded: false,
         seo: {
           title: '',
           description: '',
