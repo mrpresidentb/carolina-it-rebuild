@@ -19,7 +19,7 @@ const TermsOfUse: React.FC = () => {
 
   return (
     <>
-      <SiteHead title={page.meta.title || page.title} description={page.meta.description} />
+      <SiteHead />
       <Navbar />
       <div className="container mx-auto py-12 px-4 max-w-4xl">
         <div className="prose max-w-none" dangerouslySetInnerHTML={{ __html: page.content }} />

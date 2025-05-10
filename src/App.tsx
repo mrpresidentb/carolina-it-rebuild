@@ -1,6 +1,7 @@
+
 import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import Index from './pages';
+import Index from './pages/Index';
 import Services from './pages/Services';
 import ServicePage from './pages/ServicePage';
 import Printers from './pages/Printers';
@@ -15,7 +16,7 @@ import AdminMessages from './pages/admin/AdminMessages';
 import AdminSettings from './pages/admin/AdminSettings';
 import AdminImages from './pages/admin/AdminImages';
 import AdminLogin from './pages/admin/AdminLogin';
-import { useAuth } from './hooks/useAuth';
+import { useAuth } from '@/hooks/useAuth';
 import PrivacyPolicy from './pages/PrivacyPolicy';
 import TermsOfUse from './pages/TermsOfUse';
 
