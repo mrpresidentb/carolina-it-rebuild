@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { useWebsiteImages } from '@/hooks/useWebsiteImages';
 import { WebsiteImage } from '@/models/WebsiteImage';
 import ImageGallery from '@/components/admin/ImageGallery';
@@ -15,9 +15,9 @@ import AdminLayout from '@/components/admin/AdminLayout';
 
 const AdminImages = () => {
   const { images, isLoaded, updateImage, addImage, removeImage } = useWebsiteImages();
-  const [isAddDialogOpen, setIsAddDialogOpen] = React.useState(false);
-  const [activeTab, setActiveTab] = React.useState('all');
-  const [newImage, setNewImage] = React.useState<Partial<WebsiteImage>>({
+  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
+  const [activeTab, setActiveTab] = useState('all');
+  const [newImage, setNewImage] = useState<Partial<WebsiteImage>>({
     name: '',
     url: '',
     alt: '',
@@ -29,7 +29,8 @@ const AdminImages = () => {
       keywords: ''
     }
   });
-  const [filteredLocation, setFilteredLocation] = React.useState('');
+  const [filteredLocation, setFilteredLocation] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
 
   // Filter images based on active tab and search terms
@@ -59,38 +60,52 @@ const AdminImages = () => {
       return;
     }
 
-    console.log("Adding image with data:", {
-      name: newImage.name,
-      location: newImage.location,
-      isUploaded: newImage.isUploaded,
-      urlLength: newImage.url?.length || 0
-    });
+    setIsSubmitting(true);
 
-    const success = addImage(newImage as Omit<WebsiteImage, 'id'>);
-    if (success) {
-      toast({
-        title: "Image added",
-        description: "The image has been added successfully",
+    try {
+      console.log("Adding image with data:", {
+        name: newImage.name,
+        location: newImage.location,
+        isUploaded: newImage.isUploaded,
+        urlLength: newImage.url?.length || 0
       });
-      setIsAddDialogOpen(false);
-      setNewImage({
-        name: '',
-        url: '',
-        alt: '',
-        location: '',
-        isUploaded: false,
-        seo: {
-          title: '',
-          description: '',
-          keywords: ''
-        }
-      });
-    } else {
+
+      const imageId = addImage(newImage as Omit<WebsiteImage, 'id'>);
+      
+      if (imageId) {
+        toast({
+          title: "Image added successfully",
+          description: `The image "${newImage.name}" has been added to your website`,
+        });
+        setIsAddDialogOpen(false);
+        setNewImage({
+          name: '',
+          url: '',
+          alt: '',
+          location: '',
+          isUploaded: false,
+          seo: {
+            title: '',
+            description: '',
+            keywords: ''
+          }
+        });
+      } else {
+        toast({
+          title: "Error",
+          description: "Failed to add the image. Please try again.",
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      console.error("Error adding image:", error);
       toast({
         title: "Error",
-        description: "Failed to add the image",
+        description: "An unexpected error occurred while adding the image",
         variant: "destructive",
       });
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -225,8 +240,11 @@ const AdminImages = () => {
                 <Button variant="outline" onClick={() => setIsAddDialogOpen(false)}>
                   Cancel
                 </Button>
-                <Button onClick={handleAddImage}>
-                  Add Image
+                <Button 
+                  onClick={handleAddImage} 
+                  disabled={isSubmitting}
+                >
+                  {isSubmitting ? 'Adding...' : 'Add Image'}
                 </Button>
               </div>
             </div>
