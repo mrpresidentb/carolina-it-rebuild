@@ -19,6 +19,7 @@ import AdminLogin from './pages/admin/AdminLogin';
 import { useAuth } from '@/hooks/useAuth';
 import PrivacyPolicy from './pages/PrivacyPolicy';
 import TermsOfUse from './pages/TermsOfUse';
+import { AdminAuthProvider } from './contexts/AdminAuthContext';
 
 const App = () => {
   const { isLoggedIn } = useAuth();
@@ -32,53 +33,55 @@ const App = () => {
   };
   
   return (
-    <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<Index />} />
-        <Route path="/services" element={<Services />} />
-        <Route path="/service/:serviceId" element={<ServicePage />} />
-        <Route path="/printers" element={<Printers />} />
-        <Route path="/blog" element={<Blog />} />
-        <Route path="/blog/:postId" element={<BlogPost />} />
-        <Route path="/contact" element={<Contact />} />
-        <Route path="/privacy-policy" element={<PrivacyPolicy />} />
-        <Route path="/terms-of-use" element={<TermsOfUse />} />
-        <Route path="*" element={<NotFound />} />
-        
-        {/* Admin Routes */}
-        <Route path="/admin" element={
-          <ProtectedRoute>
-            <AdminDashboard />
-          </ProtectedRoute>
-        } />
-        <Route path="/admin/services" element={
-          <ProtectedRoute>
-            <AdminServices />
-          </ProtectedRoute>
-        } />
-        <Route path="/admin/blog" element={
-          <ProtectedRoute>
-            <AdminBlog />
-          </ProtectedRoute>
-        } />
-        <Route path="/admin/messages" element={
-          <ProtectedRoute>
-            <AdminMessages />
-          </ProtectedRoute>
-        } />
-        <Route path="/admin/settings" element={
-          <ProtectedRoute>
-            <AdminSettings />
-          </ProtectedRoute>
-        } />
-        <Route path="/admin/images" element={
-          <ProtectedRoute>
-            <AdminImages />
-          </ProtectedRoute>
-        } />
-        <Route path="/admin/login" element={<AdminLogin />} />
-      </Routes>
-    </BrowserRouter>
+    <AdminAuthProvider>
+      <BrowserRouter>
+        <Routes>
+          <Route path="/" element={<Index />} />
+          <Route path="/services" element={<Services />} />
+          <Route path="/service/:serviceId" element={<ServicePage />} />
+          <Route path="/printers" element={<Printers />} />
+          <Route path="/blog" element={<Blog />} />
+          <Route path="/blog/:postId" element={<BlogPost />} />
+          <Route path="/contact" element={<Contact />} />
+          <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+          <Route path="/terms-of-use" element={<TermsOfUse />} />
+          <Route path="*" element={<NotFound />} />
+          
+          {/* Admin Routes */}
+          <Route path="/admin" element={
+            <ProtectedRoute>
+              <AdminDashboard />
+            </ProtectedRoute>
+          } />
+          <Route path="/admin/services" element={
+            <ProtectedRoute>
+              <AdminServices />
+            </ProtectedRoute>
+          } />
+          <Route path="/admin/blog" element={
+            <ProtectedRoute>
+              <AdminBlog />
+            </ProtectedRoute>
+          } />
+          <Route path="/admin/messages" element={
+            <ProtectedRoute>
+              <AdminMessages />
+            </ProtectedRoute>
+          } />
+          <Route path="/admin/settings" element={
+            <ProtectedRoute>
+              <AdminSettings />
+            </ProtectedRoute>
+          } />
+          <Route path="/admin/images" element={
+            <ProtectedRoute>
+              <AdminImages />
+            </ProtectedRoute>
+          } />
+          <Route path="/admin/login" element={<AdminLogin />} />
+        </Routes>
+      </BrowserRouter>
+    </AdminAuthProvider>
   );
 };
 
