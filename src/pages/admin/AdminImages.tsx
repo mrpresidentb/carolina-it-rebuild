@@ -38,15 +38,19 @@ const AdminImages = () => {
     return false;
   });
 
-  const handleImageSelected = (imageUrl: string) => {
-    setNewImage({ ...newImage, url: imageUrl });
+  const handleImageSelected = (imageUrl: string, imageFile?: File) => {
+    setNewImage({ 
+      ...newImage, 
+      url: imageUrl,
+      isUploaded: !!imageFile 
+    });
   };
 
   const handleAddImage = () => {
     if (!newImage.name || !newImage.url || !newImage.location) {
       toast({
         title: "Missing required fields",
-        description: "Please provide a name, image URL, and location",
+        description: "Please provide a name, image URL or upload, and location",
         variant: "destructive",
       });
       return;

@@ -22,6 +22,11 @@ export const useWebsiteImages = () => {
   // Update an image
   const updateImage = (image: WebsiteImage) => {
     try {
+      // Make sure we have a URL even if it's from an uploaded file
+      if (!image.url && image.isUploaded) {
+        return false;
+      }
+
       const success = saveImage(image);
       if (success) {
         setImages(getWebsiteImages());
@@ -37,6 +42,11 @@ export const useWebsiteImages = () => {
   // Add a new image
   const addImage = (image: Omit<WebsiteImage, 'id'>) => {
     try {
+      // Make sure we have a URL even if it's from an uploaded file
+      if (!image.url) {
+        return null;
+      }
+      
       const newImage = {
         ...image,
         id: Date.now().toString()

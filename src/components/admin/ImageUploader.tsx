@@ -13,6 +13,7 @@ interface ImageUploaderProps {
 const ImageUploader: React.FC<ImageUploaderProps> = ({ onImageSelected, currentUrl }) => {
   const [previewUrl, setPreviewUrl] = useState<string>(currentUrl || '');
   const [isLoading, setIsLoading] = useState(false);
+  const [imageFile, setImageFile] = useState<File | null>(null);
   const { toast } = useToast();
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -29,6 +30,8 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({ onImageSelected, currentU
       return;
     }
 
+    setImageFile(file);
+
     // Create a preview URL
     const reader = new FileReader();
     reader.onload = (event) => {
@@ -42,6 +45,7 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({ onImageSelected, currentU
   const handleExternalUrlChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const url = e.target.value;
     setPreviewUrl(url);
+    setImageFile(null);
     onImageSelected(url);
   };
 
