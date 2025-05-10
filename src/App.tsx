@@ -1,3 +1,4 @@
+
 import React from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
@@ -24,6 +25,7 @@ import AdminServices from "./pages/admin/AdminServices";
 import AdminBlog from "./pages/admin/AdminBlog";
 import AdminSettings from "./pages/admin/AdminSettings";
 import AdminMessages from "./pages/admin/AdminMessages";
+import AdminImages from "./pages/admin/AdminImages";
 
 const queryClient = new QueryClient();
 
@@ -58,27 +60,24 @@ function App() {
               
               <Routes>
                 {/* Admin Routes */}
-                <Route path="/admin" element={<AdminLayout />}>
-                  <Route path="dashboard" element={<AdminDashboard />} />
-                  <Route path="services" element={<AdminServices />} />
-                  <Route path="blog" element={<AdminBlog />} />
-                  <Route path="images" element={<AdminImages />} />
-                  <Route path="messages" element={<AdminMessages />} />
-                  <Route path="settings" element={<AdminSettings />} />
-                </Route>
+                <Route path="/admin" element={<AdminLayout><AdminDashboard /></AdminLayout>} />
+                <Route path="/admin/dashboard" element={<AdminLayout><AdminDashboard /></AdminLayout>} />
+                <Route path="/admin/services" element={<AdminLayout><AdminServices /></AdminLayout>} />
+                <Route path="/admin/blog" element={<AdminLayout><AdminBlog /></AdminLayout>} />
+                <Route path="/admin/images" element={<AdminLayout><AdminImages /></AdminLayout>} />
+                <Route path="/admin/messages" element={<AdminLayout><AdminMessages /></AdminLayout>} />
+                <Route path="/admin/settings" element={<AdminLayout><AdminSettings /></AdminLayout>} />
                 <Route path="/admin/login" element={<AdminLogin />} />
                 
                 {/* Public Routes */}
-                <Route path="/" element={<Layout />}>
-                  <Route index element={<Index />} />
-                  <Route path="services" element={<Services />} />
-                  <Route path="services/:id" element={<ServicePage />} />
-                  <Route path="contact" element={<Contact />} />
-                  <Route path="blog" element={<Blog />} />
-                  <Route path="blog/:id" element={<BlogPost />} />
-                  <Route path="printers" element={<Printers />} />
-                  <Route path="*" element={<NotFound />} />
-                </Route>
+                <Route path="/" element={<Layout><Index /></Layout>} />
+                <Route path="/services" element={<Layout><Services /></Layout>} />
+                <Route path="/services/:id" element={<Layout><ServicePage /></Layout>} />
+                <Route path="/contact" element={<Layout><Contact /></Layout>} />
+                <Route path="/blog" element={<Layout><Blog /></Layout>} />
+                <Route path="/blog/:id" element={<Layout><BlogPost /></Layout>} />
+                <Route path="/printers" element={<Layout><Printers /></Layout>} />
+                <Route path="*" element={<Layout><NotFound /></Layout>} />
               </Routes>
             </BrowserRouter>
           </TooltipProvider>

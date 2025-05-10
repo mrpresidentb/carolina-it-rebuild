@@ -1,22 +1,23 @@
 
-import React, { useState } from 'react';
+import React from 'react';
 import { useWebsiteImages } from '@/hooks/useWebsiteImages';
 import { WebsiteImage } from '@/models/WebsiteImage';
 import ImageGallery from '@/components/admin/ImageGallery';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Plus, Image } from 'lucide-react';
+import { Plus } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import ImageUploader from '@/components/admin/ImageUploader';
 import { useToast } from '@/hooks/use-toast';
+import AdminLayout from '@/components/admin/AdminLayout';
 
 const AdminImages = () => {
   const { images, isLoaded, updateImage, addImage, removeImage } = useWebsiteImages();
-  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState('all');
-  const [newImage, setNewImage] = useState<Partial<WebsiteImage>>({
+  const [isAddDialogOpen, setIsAddDialogOpen] = React.useState(false);
+  const [activeTab, setActiveTab] = React.useState('all');
+  const [newImage, setNewImage] = React.useState<Partial<WebsiteImage>>({
     name: '',
     url: '',
     alt: '',
@@ -27,7 +28,7 @@ const AdminImages = () => {
       keywords: ''
     }
   });
-  const [filteredLocation, setFilteredLocation] = useState('');
+  const [filteredLocation, setFilteredLocation] = React.useState('');
   const { toast } = useToast();
 
   // Filter images based on active tab and search terms
@@ -111,111 +112,113 @@ const AdminImages = () => {
   };
 
   if (!isLoaded) {
-    return <div className="flex items-center justify-center p-12">Loading...</div>;
+    return <AdminLayout title="Images"><div className="flex items-center justify-center p-12">Loading...</div></AdminLayout>;
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold">Website Images</h1>
-        <Button onClick={() => setIsAddDialogOpen(true)}>
-          <Plus className="h-4 w-4 mr-2" />
-          Add New Image
-        </Button>
-      </div>
-
-      <Tabs defaultValue="all" value={activeTab} onValueChange={setActiveTab} className="space-y-4">
+    <AdminLayout title="Images">
+      <div className="space-y-6">
         <div className="flex items-center justify-between">
-          <TabsList>
-            <TabsTrigger value="all">All Images</TabsTrigger>
-            <TabsTrigger value="filter">Filter by Location</TabsTrigger>
-          </TabsList>
-          
-          <div className="flex items-center space-x-2">
-            <p className="text-sm text-muted-foreground">
-              {images.length} {images.length === 1 ? 'image' : 'images'} total
-            </p>
-          </div>
+          <h1 className="text-2xl font-bold">Website Images</h1>
+          <Button onClick={() => setIsAddDialogOpen(true)}>
+            <Plus className="h-4 w-4 mr-2" />
+            Add New Image
+          </Button>
         </div>
-        
-        <TabsContent value="filter" className="space-y-4">
-          <div className="flex items-center space-x-2">
-            <div className="grid flex-1 gap-2">
-              <Label htmlFor="location-filter">Filter by Image Location</Label>
-              <Input
-                id="location-filter"
-                placeholder="e.g., homepage-hero"
-                value={filteredLocation}
-                onChange={(e) => setFilteredLocation(e.target.value)}
-              />
-            </div>
-          </div>
-        </TabsContent>
-      </Tabs>
 
-      <ImageGallery 
-        images={filteredImages}
-        onUpdate={handleUpdateImage}
-        onDelete={handleDeleteImage}
-      />
-
-      {/* Add New Image Dialog */}
-      <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle>Add New Image</DialogTitle>
-          </DialogHeader>
-          <div className="space-y-4 py-4">
-            <div className="space-y-2">
-              <Label htmlFor="image-name">Image Name</Label>
-              <Input
-                id="image-name"
-                placeholder="e.g., Homepage Hero Banner"
-                value={newImage.name}
-                onChange={(e) => setNewImage({ ...newImage, name: e.target.value })}
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="image-location">Image Location</Label>
-              <Input
-                id="image-location"
-                placeholder="e.g., homepage-hero"
-                value={newImage.location}
-                onChange={(e) => setNewImage({ ...newImage, location: e.target.value })}
-              />
+        <Tabs defaultValue="all" value={activeTab} onValueChange={setActiveTab} className="space-y-4">
+          <div className="flex items-center justify-between">
+            <TabsList>
+              <TabsTrigger value="all">All Images</TabsTrigger>
+              <TabsTrigger value="filter">Filter by Location</TabsTrigger>
+            </TabsList>
+            
+            <div className="flex items-center space-x-2">
               <p className="text-sm text-muted-foreground">
-                This helps identify where this image is used on the website
+                {images.length} {images.length === 1 ? 'image' : 'images'} total
               </p>
             </div>
-
-            <div className="space-y-2">
-              <Label>Image File</Label>
-              <ImageUploader onImageSelected={handleImageSelected} />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="image-alt">Alt Text (for SEO)</Label>
-              <Input
-                id="image-alt"
-                placeholder="Describe what's in the image"
-                value={newImage.alt}
-                onChange={(e) => setNewImage({ ...newImage, alt: e.target.value })}
-              />
-            </div>
-
-            <div className="flex justify-end space-x-2 pt-4">
-              <Button variant="outline" onClick={() => setIsAddDialogOpen(false)}>
-                Cancel
-              </Button>
-              <Button onClick={handleAddImage}>
-                Add Image
-              </Button>
-            </div>
           </div>
-        </DialogContent>
-      </Dialog>
-    </div>
+          
+          <TabsContent value="filter" className="space-y-4">
+            <div className="flex items-center space-x-2">
+              <div className="grid flex-1 gap-2">
+                <Label htmlFor="location-filter">Filter by Image Location</Label>
+                <Input
+                  id="location-filter"
+                  placeholder="e.g., homepage-hero"
+                  value={filteredLocation}
+                  onChange={(e) => setFilteredLocation(e.target.value)}
+                />
+              </div>
+            </div>
+          </TabsContent>
+        </Tabs>
+
+        <ImageGallery 
+          images={filteredImages}
+          onUpdate={handleUpdateImage}
+          onDelete={handleDeleteImage}
+        />
+
+        {/* Add New Image Dialog */}
+        <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
+          <DialogContent className="sm:max-w-md">
+            <DialogHeader>
+              <DialogTitle>Add New Image</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-4 py-4">
+              <div className="space-y-2">
+                <Label htmlFor="image-name">Image Name</Label>
+                <Input
+                  id="image-name"
+                  placeholder="e.g., Homepage Hero Banner"
+                  value={newImage.name}
+                  onChange={(e) => setNewImage({ ...newImage, name: e.target.value })}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="image-location">Image Location</Label>
+                <Input
+                  id="image-location"
+                  placeholder="e.g., homepage-hero"
+                  value={newImage.location}
+                  onChange={(e) => setNewImage({ ...newImage, location: e.target.value })}
+                />
+                <p className="text-sm text-muted-foreground">
+                  This helps identify where this image is used on the website
+                </p>
+              </div>
+
+              <div className="space-y-2">
+                <Label>Image File</Label>
+                <ImageUploader onImageSelected={handleImageSelected} />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="image-alt">Alt Text (for SEO)</Label>
+                <Input
+                  id="image-alt"
+                  placeholder="Describe what's in the image"
+                  value={newImage.alt}
+                  onChange={(e) => setNewImage({ ...newImage, alt: e.target.value })}
+                />
+              </div>
+
+              <div className="flex justify-end space-x-2 pt-4">
+                <Button variant="outline" onClick={() => setIsAddDialogOpen(false)}>
+                  Cancel
+                </Button>
+                <Button onClick={handleAddImage}>
+                  Add Image
+                </Button>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
+      </div>
+    </AdminLayout>
   );
 };
 
