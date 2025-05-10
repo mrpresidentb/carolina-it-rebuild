@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import AdminLayout from '@/components/admin/AdminLayout';
@@ -12,6 +11,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 import { useSettings, SiteSettings, defaultSettings } from '@/hooks/useSettings';
+import { useWebsiteImages } from '@/hooks/useWebsiteImages';
+import ImageUploader from '@/components/admin/ImageUploader';
+import { WebsiteImage } from '@/models/WebsiteImage';
 
 // Define available pages for SEO settings
 const availablePages = [
@@ -24,9 +26,32 @@ const availablePages = [
 
 const AdminSettings = () => {
   const { settings: savedSettings, saveSettings, isLoaded } = useSettings();
+  const { images, updateImage, addImage, getImageForLocation } = useWebsiteImages();
   const [settings, setSettings] = useState<SiteSettings>(defaultSettings);
   const [activeTab, setActiveTab] = useState("seo");
   const [selectedPage, setSelectedPage] = useState("/");
+  const [selectedImageLocation, setSelectedImageLocation] = useState("homepage-hero");
+  const [imageBeingEdited, setImageBeingEdited] = useState<WebsiteImage | null>(null);
+  const [newImageData, setNewImageData] = useState({
+    name: '',
+    url: '',
+    alt: '',
+    location: '',
+    seo: {
+      title: '',
+      description: '',
+      keywords: ''
+    }
+  });
+
+  // Image locations by page
+  const imageLocations = {
+    "/": ["homepage-hero", "homepage-services", "homepage-about"],
+    "/services": ["services-hero", "services-banner"],
+    "/printers": ["printer-services-hero", "printer-services-banner"],
+    "/blog": ["blog-hero"],
+    "/contact": ["contact-hero"]
+  };
 
   useEffect(() => {
     if (isLoaded) {
@@ -34,6 +59,133 @@ const AdminSettings = () => {
     }
   }, [savedSettings, isLoaded]);
 
+  useEffect(() => {
+    // Get current image for selected location
+    const currentImage = getImageForLocation(selectedImageLocation);
+    setImageBeingEdited(currentImage || null);
+    
+    // Reset new image data form
+    if (currentImage) {
+      setNewImageData({
+        name: currentImage.name,
+        url: currentImage.url,
+        alt: currentImage.alt || '',
+        location: currentImage.location,
+        seo: {
+          title: currentImage.seo?.title || '',
+          description: currentImage.seo?.description || '',
+          keywords: currentImage.seo?.keywords || ''
+        }
+      });
+    } else {
+      setNewImageData({
+        name: selectedImageLocation.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' '),
+        url: '',
+        alt: '',
+        location: selectedImageLocation,
+        seo: {
+          title: '',
+          description: '',
+          keywords: ''
+        }
+      });
+    }
+  }, [selectedImageLocation, getImageForLocation]);
+
+  // Update image location options when page changes
+  useEffect(() => {
+    if (imageLocations[selectedPage as keyof typeof imageLocations]?.length > 0) {
+      setSelectedImageLocation(imageLocations[selectedPage as keyof typeof imageLocations][0]);
+    }
+  }, [selectedPage]);
+
+  // Handle image form field changes
+  const handleImageFieldChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    
+    if (name.startsWith('seo.')) {
+      const seoField = name.split('.')[1];
+      setNewImageData(prev => ({
+        ...prev,
+        seo: {
+          ...prev.seo,
+          [seoField]: value
+        }
+      }));
+    } else {
+      setNewImageData(prev => ({
+        ...prev,
+        [name]: value
+      }));
+    }
+  };
+
+  // Handle image upload
+  const handleImageSelected = (imageUrl: string) => {
+    setNewImageData(prev => ({
+      ...prev,
+      url: imageUrl
+    }));
+  };
+
+  // Save image
+  const handleSaveImage = () => {
+    if (!newImageData.url) {
+      toast({
+        title: "Image URL is required",
+        description: "Please upload an image or provide a valid URL",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    if (imageBeingEdited) {
+      // Update existing image
+      const updatedImage = {
+        ...imageBeingEdited,
+        name: newImageData.name,
+        url: newImageData.url,
+        alt: newImageData.alt,
+        location: newImageData.location,
+        seo: newImageData.seo
+      };
+      
+      const success = updateImage(updatedImage);
+      if (success) {
+        toast({
+          title: "Image updated",
+          description: "The image has been updated successfully",
+        });
+        setImageBeingEdited(updatedImage);
+      } else {
+        toast({
+          title: "Error",
+          description: "Failed to update image",
+          variant: "destructive"
+        });
+      }
+    } else {
+      // Add new image
+      const success = addImage(newImageData);
+      if (success) {
+        toast({
+          title: "Image added",
+          description: "The new image has been added successfully",
+        });
+        // Refresh the current image
+        const currentImage = getImageForLocation(selectedImageLocation);
+        setImageBeingEdited(currentImage || null);
+      } else {
+        toast({
+          title: "Error",
+          description: "Failed to add image",
+          variant: "destructive"
+        });
+      }
+    }
+  };
+
+  // Handle SEO change
   const handleSEOChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setSettings(prev => ({
@@ -209,6 +361,12 @@ const AdminSettings = () => {
             className="rounded-none border-b-2 border-transparent px-4 py-2 data-[state=active]:border-primary data-[state=active]:bg-transparent"
           >
             Theme Settings
+          </TabsTrigger>
+          <TabsTrigger 
+            value="images"
+            className="rounded-none border-b-2 border-transparent px-4 py-2 data-[state=active]:border-primary data-[state=active]:bg-transparent"
+          >
+            Image Settings
           </TabsTrigger>
           <TabsTrigger 
             value="contact"
@@ -833,6 +991,195 @@ const AdminSettings = () => {
                     <div className="text-sm">Footer Preview</div>
                   </div>
                 </div>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="images" className="mt-0 space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle>
+                <div className="flex items-center">
+                  <Image className="mr-2 h-5 w-5" />
+                  Page Images
+                </div>
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  {/* Page selector */}
+                  <div className="mb-6">
+                    <Label htmlFor="pageSelect" className="block text-sm font-medium mb-1">
+                      Select Page
+                    </Label>
+                    <Select 
+                      value={selectedPage} 
+                      onValueChange={setSelectedPage}
+                    >
+                      <SelectTrigger className="w-full">
+                        <SelectValue placeholder="Select a page" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {availablePages.map((page) => (
+                          <SelectItem key={page.value} value={page.value}>
+                            {page.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  {/* Image location selector */}
+                  <div className="mb-6">
+                    <Label htmlFor="imageLocationSelect" className="block text-sm font-medium mb-1">
+                      Image Location
+                    </Label>
+                    <Select 
+                      value={selectedImageLocation} 
+                      onValueChange={setSelectedImageLocation}
+                    >
+                      <SelectTrigger className="w-full">
+                        <SelectValue placeholder="Select image location" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {selectedPage && imageLocations[selectedPage as keyof typeof imageLocations]?.map((location) => (
+                          <SelectItem key={location} value={location}>
+                            {location.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  {/* Current image preview */}
+                  <div className="mb-6">
+                    <Label className="block text-sm font-medium mb-2">
+                      Current Image
+                    </Label>
+                    <div className="border rounded-md overflow-hidden h-48 flex items-center justify-center bg-gray-50">
+                      {imageBeingEdited?.url ? (
+                        <img 
+                          src={imageBeingEdited.url} 
+                          alt={imageBeingEdited.alt || 'Current image'} 
+                          className="max-h-full max-w-full object-contain"
+                        />
+                      ) : (
+                        <div className="text-gray-400 text-center">
+                          <Image className="mx-auto h-10 w-10 mb-2" />
+                          <p>No image set for this location</p>
+                        </div>
+                      )}
+                    </div>
+                    {imageBeingEdited?.name && (
+                      <p className="text-sm mt-1 text-center font-medium">{imageBeingEdited.name}</p>
+                    )}
+                  </div>
+                </div>
+
+                <div className="space-y-4">
+                  {/* Image name */}
+                  <div>
+                    <Label htmlFor="imageName" className="block text-sm font-medium mb-1">
+                      Image Name
+                    </Label>
+                    <Input 
+                      id="imageName"
+                      name="name"
+                      value={newImageData.name} 
+                      onChange={handleImageFieldChange}
+                      placeholder="e.g., Homepage Hero Banner"
+                    />
+                  </div>
+
+                  {/* Image alt text */}
+                  <div>
+                    <Label htmlFor="imageAlt" className="block text-sm font-medium mb-1">
+                      Alt Text
+                    </Label>
+                    <Input 
+                      id="imageAlt"
+                      name="alt"
+                      value={newImageData.alt} 
+                      onChange={handleImageFieldChange}
+                      placeholder="Descriptive text for screen readers and SEO"
+                    />
+                    <p className="text-xs text-gray-500 mt-1">Important for accessibility and SEO</p>
+                  </div>
+
+                  {/* Image upload */}
+                  <div>
+                    <Label className="block text-sm font-medium mb-2">
+                      Change Image
+                    </Label>
+                    <ImageUploader onImageSelected={handleImageSelected} />
+                    {newImageData.url && newImageData.url !== imageBeingEdited?.url && (
+                      <div className="mt-4 border rounded-md overflow-hidden p-2">
+                        <p className="text-sm font-medium mb-2">New image will replace current one:</p>
+                        <img 
+                          src={newImageData.url} 
+                          alt="New image preview" 
+                          className="max-h-32 max-w-full object-contain mx-auto"
+                        />
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Image SEO */}
+                  <div>
+                    <Label className="block text-sm font-medium mb-2">
+                      Image SEO Data
+                    </Label>
+                    <div className="space-y-3">
+                      <div>
+                        <Label htmlFor="imageSeoTitle" className="block text-xs mb-1">
+                          SEO Title
+                        </Label>
+                        <Input 
+                          id="imageSeoTitle"
+                          name="seo.title"
+                          value={newImageData.seo.title} 
+                          onChange={handleImageFieldChange}
+                          placeholder="SEO title for this image"
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="imageSeoDesc" className="block text-xs mb-1">
+                          SEO Description
+                        </Label>
+                        <Textarea 
+                          id="imageSeoDesc"
+                          name="seo.description"
+                          value={newImageData.seo.description} 
+                          onChange={handleImageFieldChange}
+                          placeholder="SEO description for this image"
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="imageSeoKeywords" className="block text-xs mb-1">
+                          SEO Keywords
+                        </Label>
+                        <Input 
+                          id="imageSeoKeywords"
+                          name="seo.keywords"
+                          value={newImageData.seo.keywords} 
+                          onChange={handleImageFieldChange}
+                          placeholder="Keywords separated by commas"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="mt-4 flex justify-end">
+                <Button 
+                  onClick={handleSaveImage}
+                  className="bg-blue-500 hover:bg-blue-600"
+                >
+                  {imageBeingEdited ? 'Update Image' : 'Add Image'}
+                </Button>
               </div>
             </CardContent>
           </Card>
