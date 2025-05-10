@@ -16,16 +16,15 @@ import AdminMessages from './pages/admin/AdminMessages';
 import AdminSettings from './pages/admin/AdminSettings';
 import AdminImages from './pages/admin/AdminImages';
 import AdminLogin from './pages/admin/AdminLogin';
-import { useAuth } from '@/hooks/useAuth';
 import PrivacyPolicy from './pages/PrivacyPolicy';
 import TermsOfUse from './pages/TermsOfUse';
-import { AdminAuthProvider } from './contexts/AdminAuthContext';
+import { AdminAuthProvider, useAdminAuth } from './contexts/AdminAuthContext';
 
 const App = () => {
-  const { isLoggedIn } = useAuth();
-
   const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
-    if (!isLoggedIn()) {
+    const { isAuthenticated } = useAdminAuth();
+    
+    if (!isAuthenticated) {
       return <Navigate to="/admin/login" />;
     }
 
