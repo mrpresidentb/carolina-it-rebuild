@@ -19,6 +19,21 @@ import AdminLogin from './pages/admin/AdminLogin';
 import PrivacyPolicy from './pages/PrivacyPolicy';
 import TermsOfUse from './pages/TermsOfUse';
 import { AdminAuthProvider, useAdminAuth } from './contexts/AdminAuthContext';
+import Navbar from './components/Navbar';
+import Footer from './components/Footer';
+import SiteHead from './components/SiteHead';
+
+// Layout component to wrap public pages with Navbar and Footer
+const PublicLayout = ({ children }: { children: React.ReactNode }) => {
+  return (
+    <>
+      <SiteHead />
+      <Navbar />
+      <main>{children}</main>
+      <Footer />
+    </>
+  );
+};
 
 const App = () => {
   const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
@@ -35,16 +50,17 @@ const App = () => {
     <AdminAuthProvider>
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={<Index />} />
-          <Route path="/services" element={<Services />} />
-          <Route path="/service/:serviceId" element={<ServicePage />} />
-          <Route path="/printers" element={<Printers />} />
-          <Route path="/blog" element={<Blog />} />
-          <Route path="/blog/:postId" element={<BlogPost />} />
-          <Route path="/contact" element={<Contact />} />
-          <Route path="/privacy-policy" element={<PrivacyPolicy />} />
-          <Route path="/terms-of-use" element={<TermsOfUse />} />
-          <Route path="*" element={<NotFound />} />
+          {/* Public Routes with Navbar and Footer */}
+          <Route path="/" element={<PublicLayout><Index /></PublicLayout>} />
+          <Route path="/services" element={<PublicLayout><Services /></PublicLayout>} />
+          <Route path="/service/:serviceId" element={<PublicLayout><ServicePage /></PublicLayout>} />
+          <Route path="/printers" element={<PublicLayout><Printers /></PublicLayout>} />
+          <Route path="/blog" element={<PublicLayout><Blog /></PublicLayout>} />
+          <Route path="/blog/:postId" element={<PublicLayout><BlogPost /></PublicLayout>} />
+          <Route path="/contact" element={<PublicLayout><Contact /></PublicLayout>} />
+          <Route path="/privacy-policy" element={<PublicLayout><PrivacyPolicy /></PublicLayout>} />
+          <Route path="/terms-of-use" element={<PublicLayout><TermsOfUse /></PublicLayout>} />
+          <Route path="*" element={<PublicLayout><NotFound /></PublicLayout>} />
           
           {/* Admin Routes */}
           <Route path="/admin" element={
