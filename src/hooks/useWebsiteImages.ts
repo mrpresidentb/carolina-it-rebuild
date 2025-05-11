@@ -24,27 +24,47 @@ export const useWebsiteImages = () => {
   // Update an image
   const updateImage = (image: WebsiteImage) => {
     try {
-      console.log("DEBUG: Updating image", { id: image.id, name: image.name });
+      console.log("DEBUG [updateImage]: Starting to update image", { 
+        id: image.id, 
+        name: image.name,
+        location: image.location
+      });
       
-      // Make sure we have a URL
+      // Extra validation
       if (!image.url) {
-        console.error("DEBUG: Cannot save image without URL");
+        console.error("DEBUG [updateImage]: Cannot save image without URL");
         return false;
       }
 
-      console.log("DEBUG: Image URL length:", image.url.length);
-      console.log("DEBUG: Image URL starts with:", image.url.substring(0, 20));
+      if (typeof image.url !== 'string') {
+        console.error("DEBUG [updateImage]: URL is not a string type:", typeof image.url);
+        return false;
+      }
+
+      if (image.url.trim() === '') {
+        console.error("DEBUG [updateImage]: URL is an empty string");
+        return false;
+      }
+
+      console.log("DEBUG [updateImage]: Image URL length:", image.url.length);
+      console.log("DEBUG [updateImage]: Image URL starts with:", image.url.substring(0, 30));
       
+      console.log("DEBUG [updateImage]: Calling saveImage function");
       const success = saveImage(image);
-      console.log("DEBUG: Image update result:", success);
+      console.log("DEBUG [updateImage]: Image update result:", success);
       
       if (success) {
-        setImages(getWebsiteImages());
+        console.log("DEBUG [updateImage]: Update successful, refreshing images list");
+        const refreshedImages = getWebsiteImages();
+        console.log("DEBUG [updateImage]: Refreshed images count:", refreshedImages.length);
+        setImages(refreshedImages);
         return true;
       }
+      console.error("DEBUG [updateImage]: saveImage returned false");
       return false;
     } catch (error) {
-      console.error("DEBUG: Error updating image:", error);
+      console.error("DEBUG [updateImage]: Error updating image:", error);
+      console.error("DEBUG [updateImage]: Error stack:", (error as Error).stack);
       return false;
     }
   };
@@ -55,12 +75,18 @@ export const useWebsiteImages = () => {
       console.log("DEBUG [addImage]: Adding new image:", { 
         name: image.name, 
         location: image.location,
-        hasURL: !!image.url
+        hasURL: !!image.url,
+        urlType: typeof image.url
       });
       
       // Enhanced URL validation logging
       if (!image.url) {
         console.error("DEBUG [addImage]: Cannot add image - URL is null or undefined");
+        return null;
+      }
+      
+      if (typeof image.url !== 'string') {
+        console.error("DEBUG [addImage]: URL is not a string type:", typeof image.url);
         return null;
       }
       

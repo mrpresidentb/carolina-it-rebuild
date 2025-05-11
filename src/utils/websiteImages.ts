@@ -68,6 +68,10 @@ export const getImageByLocation = (location: string): WebsiteImage | undefined =
   try {
     const images = getWebsiteImages();
     const image = images.find(image => image.location === location);
+    console.log(`DEBUG [websiteImages]: Found image by location ${location}: ${!!image}`);
+    if (image) {
+      console.log(`DEBUG [websiteImages]: Image details - id: ${image.id}, name: ${image.name}, url length: ${image.url.length}`);
+    }
     return image;
   } catch (error) {
     console.error(`DEBUG [websiteImages]: Error finding image by location ${location}:`, error);
@@ -81,12 +85,20 @@ export const saveImage = (image: WebsiteImage): boolean => {
     console.log(`DEBUG [websiteImages]: Attempting to save image:`, {
       id: image.id,
       name: image.name,
+      location: image.location,
       hasUrl: !!image.url,
-      urlLength: image.url?.length || 0
+      urlLength: image.url?.length || 0,
+      urlType: typeof image.url
     });
     
     if (!image.url || image.url.trim() === '') {
       console.error("DEBUG [websiteImages]: Cannot save image with empty URL");
+      return false;
+    }
+    
+    // Extra validation for URL type
+    if (typeof image.url !== 'string') {
+      console.error("DEBUG [websiteImages]: URL is not a string:", typeof image.url);
       return false;
     }
     
@@ -117,10 +129,28 @@ export const saveImage = (image: WebsiteImage): boolean => {
       return false;
     }
     
-    const savedImages = JSON.parse(savedDataString);
-    console.log(`DEBUG [websiteImages]: Verified ${savedImages.length} images in localStorage after save`);
-    
-    return true;
+    try {
+      const savedImages = JSON.parse(savedDataString);
+      console.log(`DEBUG [websiteImages]: Verified ${savedImages.length} images in localStorage after save`);
+      
+      // Verify our specific image was saved
+      const savedImage = savedImages.find((img: WebsiteImage) => img.id === image.id);
+      if (!savedImage) {
+        console.error("DEBUG [websiteImages]: Image not found in saved data");
+        return false;
+      }
+      
+      console.log("DEBUG [websiteImages]: Image verified in saved data:", {
+        id: savedImage.id,
+        name: savedImage.name,
+        urlLength: savedImage.url?.length || 0
+      });
+      
+      return true;
+    } catch (error) {
+      console.error("DEBUG [websiteImages]: Error parsing saved data:", error);
+      return false;
+    }
   } catch (error) {
     console.error("DEBUG [websiteImages]: Error saving image:", error);
     console.error("DEBUG [websiteImages]: Error stack:", (error as Error).stack);

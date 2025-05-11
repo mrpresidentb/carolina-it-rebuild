@@ -75,14 +75,22 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({ onImageSelected, currentU
       }
       
       setPreviewUrl(result);
-      console.log("DEBUG [ImageUploader]: Calling onImageSelected with data URL and file");
-      onImageSelected(result, file); // Pass both the data URL and the file
-      setIsLoading(false);
+      console.log("DEBUG [ImageUploader]: Setting preview URL. Length:", result.length);
+      console.log("DEBUG [ImageUploader]: About to call onImageSelected with data URL");
+      // ⚠️ Important diagnostic - Log the component instance to check for memory issues
+      console.log("DEBUG [ImageUploader]: Component instance ID:", Date.now());
       
-      toast({
-        title: "Image selected",
-        description: "Image has been selected and is ready to be saved.",
-      });
+      // Add timeout to ensure we're not causing a React update cycle issue
+      setTimeout(() => {
+        console.log("DEBUG [ImageUploader]: Calling onImageSelected with data URL (in timeout)");
+        onImageSelected(result, file); // Pass both the data URL and the file
+        setIsLoading(false);
+        
+        toast({
+          title: "Image selected",
+          description: "Image has been selected and is ready to be saved.",
+        });
+      }, 0);
     };
     reader.onerror = (error) => {
       console.error("DEBUG [ImageUploader]: File read error", error);
@@ -98,7 +106,8 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({ onImageSelected, currentU
 
   const handleExternalUrlChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const url = e.target.value.trim();
-    console.log("DEBUG [ImageUploader]: URL entered:", url ? url.substring(0, 30) + "..." : "empty");
+    console.log("DEBUG [ImageUploader]: External URL entered:", url ? url.substring(0, 30) + "..." : "empty");
+    console.log("DEBUG [ImageUploader]: URL type:", typeof url);
     
     if (url === '') {
       console.log("DEBUG [ImageUploader]: Empty URL entered");
@@ -122,15 +131,22 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({ onImageSelected, currentU
     }
     
     setPreviewUrl(url);
+    console.log("DEBUG [ImageUploader]: Set preview URL to external URL");
     setImageFile(null);
-    onImageSelected(url); // Only pass URL for external images
     
-    if (url) {
-      toast({
-        title: "URL entered",
-        description: "External image URL has been set",
-      });
-    }
+    // Add timeout to ensure we're not causing a React update cycle issue
+    setTimeout(() => {
+      console.log("DEBUG [ImageUploader]: Calling onImageSelected with external URL (in timeout)");
+      console.log("DEBUG [ImageUploader]: URL being passed:", url);
+      onImageSelected(url); // Only pass URL for external images
+      
+      if (url) {
+        toast({
+          title: "URL entered",
+          description: "External image URL has been set",
+        });
+      }
+    }, 0);
   };
 
   return (
