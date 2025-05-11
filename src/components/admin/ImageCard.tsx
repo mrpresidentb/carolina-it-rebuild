@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -23,11 +22,19 @@ const ImageCard: React.FC<ImageCardProps> = ({ image, onUpdate, onDelete }) => {
   const { toast } = useToast();
 
   const handleImageSelected = (imageUrl: string) => {
+    console.log("DEBUG: Image selected in card component");
+    console.log("DEBUG: URL length:", imageUrl?.length || 0);
+    console.log("DEBUG: URL starts with:", imageUrl?.substring(0, 20) || "empty");
+    
     setTempImage({ ...tempImage, url: imageUrl });
   };
 
   const handleSaveImage = () => {
-    if (!tempImage.url) {
+    console.log("DEBUG: Attempting to save image");
+    console.log("DEBUG: Image URL present:", !!tempImage.url);
+    
+    if (!tempImage.url || tempImage.url.trim() === '') {
+      console.error("DEBUG: Image URL is empty or invalid");
       toast({
         title: "Error",
         description: "Image URL is required",
@@ -37,29 +44,42 @@ const ImageCard: React.FC<ImageCardProps> = ({ image, onUpdate, onDelete }) => {
     }
     
     setIsSaving(true);
+    console.log("DEBUG: Set saving state to true");
     
     try {
+      console.log("DEBUG: Calling onUpdate with image:", {
+        id: tempImage.id,
+        name: tempImage.name,
+        urlLength: tempImage.url.length
+      });
+      
       onUpdate(tempImage);
+      
+      console.log("DEBUG: Update completed");
+      
       toast({
         title: "Success",
         description: "Image has been updated successfully",
       });
       setEditMode(null);
     } catch (error) {
+      console.error("DEBUG: Error in handleSaveImage:", error);
       toast({
         title: "Error",
         description: "Failed to update image",
         variant: "destructive",
       });
-      console.error("Error updating image:", error);
     } finally {
+      console.log("DEBUG: Setting saving state to false");
       setIsSaving(false);
     }
   };
 
   const handleSEOUpdate = (updatedImage: Partial<WebsiteImage>) => {
     try {
+      console.log("DEBUG: Handling SEO update", updatedImage);
       const newImage = { ...image, ...updatedImage };
+      console.log("DEBUG: Calling onUpdate with merged image");
       onUpdate(newImage);
       toast({
         title: "Success",
@@ -67,12 +87,12 @@ const ImageCard: React.FC<ImageCardProps> = ({ image, onUpdate, onDelete }) => {
       });
       setEditMode(null);
     } catch (error) {
+      console.error("DEBUG: Error updating SEO info:", error);
       toast({
         title: "Error",
         description: "Failed to update SEO information",
         variant: "destructive",
       });
-      console.error("Error updating SEO info:", error);
     }
   };
 
@@ -88,6 +108,7 @@ const ImageCard: React.FC<ImageCardProps> = ({ image, onUpdate, onDelete }) => {
             alt={image.alt || image.name} 
             className="w-full h-full object-cover"
             onError={(e) => {
+              console.error("DEBUG: Error loading image in card:", image.url);
               (e.target as HTMLImageElement).src = "https://via.placeholder.com/400x300?text=Image+Not+Found";
             }}
           />
@@ -108,9 +129,11 @@ const ImageCard: React.FC<ImageCardProps> = ({ image, onUpdate, onDelete }) => {
       </CardContent>
       <CardFooter className="border-t pt-3 justify-between">
         <Dialog open={editMode === 'image'} onOpenChange={(open) => {
+          console.log("DEBUG: Image dialog open change:", open);
           if (!open) setEditMode(null);
           if (open) {
             setEditMode('image');
+            console.log("DEBUG: Reset temp image", { id: image.id, name: image.name });
             setTempImage({ ...image }); // Reset temp image when opening dialog
           }
         }}>
@@ -143,6 +166,7 @@ const ImageCard: React.FC<ImageCardProps> = ({ image, onUpdate, onDelete }) => {
 
         <div className="flex space-x-2">
           <Dialog open={editMode === 'seo'} onOpenChange={(open) => {
+            console.log("DEBUG: SEO dialog open change:", open);
             if (!open) setEditMode(null);
             if (open) setEditMode('seo');
           }}>
@@ -176,6 +200,7 @@ const ImageCard: React.FC<ImageCardProps> = ({ image, onUpdate, onDelete }) => {
               <AlertDialogFooter>
                 <AlertDialogCancel>Cancel</AlertDialogCancel>
                 <AlertDialogAction onClick={() => {
+                  console.log("DEBUG: Delete image action triggered for:", image.id);
                   onDelete(image.id);
                   toast({
                     title: "Success",

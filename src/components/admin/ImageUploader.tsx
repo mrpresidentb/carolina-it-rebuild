@@ -18,10 +18,20 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({ onImageSelected, currentU
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (!file) return;
+    if (!file) {
+      console.log("DEBUG: No file selected");
+      return;
+    }
+
+    console.log("DEBUG: File selected", { 
+      name: file.name, 
+      type: file.type, 
+      size: `${(file.size / 1024).toFixed(2)}KB` 
+    });
 
     // For image size validation
     if (file.size > 5 * 1024 * 1024) { // 5MB
+      console.log("DEBUG: File too large", { size: file.size });
       toast({
         title: "File too large",
         description: "Image must be less than 5MB",
@@ -37,6 +47,7 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({ onImageSelected, currentU
     const reader = new FileReader();
     reader.onload = (event) => {
       const result = event.target?.result as string;
+      console.log("DEBUG: File read success, data URL length:", result?.length || 0);
       setPreviewUrl(result);
       onImageSelected(result, file); // Pass both the data URL and the file
       setIsLoading(false);
@@ -46,7 +57,8 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({ onImageSelected, currentU
         description: "Image has been selected and is ready to be saved.",
       });
     };
-    reader.onerror = () => {
+    reader.onerror = (error) => {
+      console.error("DEBUG: File read error", error);
       toast({
         title: "Error loading image",
         description: "Failed to read the selected image file",
@@ -58,7 +70,8 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({ onImageSelected, currentU
   };
 
   const handleExternalUrlChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const url = e.target.value;
+    const url = e.target.value.trim();
+    console.log("DEBUG: URL entered:", url ? url.substring(0, 30) + "..." : "empty");
     setPreviewUrl(url);
     setImageFile(null);
     onImageSelected(url); // Only pass URL for external images
@@ -113,7 +126,8 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({ onImageSelected, currentU
               src={previewUrl} 
               alt="Preview" 
               className="max-h-64 mx-auto object-contain"
-              onError={() => {
+              onError={(e) => {
+                console.error("DEBUG: Image preview error", { url: previewUrl });
                 toast({
                   title: "Error loading image",
                   description: "The image URL is invalid or inaccessible",
