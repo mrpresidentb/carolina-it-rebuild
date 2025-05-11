@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useWebsiteImages } from '@/hooks/useWebsiteImages';
 import { WebsiteImage } from '@/models/WebsiteImage';
 import ImageGallery from '@/components/admin/ImageGallery';
@@ -34,6 +34,14 @@ const AdminImages = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
 
+  // For debugging, log images when they change
+  useEffect(() => {
+    console.log("DEBUG [AdminImages]: Images in state:", images.length);
+    images.forEach(img => {
+      console.log(`DEBUG [AdminImages]: Image ${img.id}: ${img.name}, loc: ${img.location}, url: ${img.url.substring(0, 20)}...`);
+    });
+  }, [images]);
+
   // Filter images based on active tab and search terms
   const filteredImages = images.filter(image => {
     if (activeTab === 'all') return true;
@@ -42,13 +50,17 @@ const AdminImages = () => {
   });
 
   const handleImageSelected = (imageUrl: string, imageFile?: File) => {
+    // Debug the received imageUrl
+    console.log("DEBUG [AdminImages]: Image selected:", 
+      imageUrl ? `URL length: ${imageUrl.length}, starts with: ${imageUrl.substring(0, 20)}...` : "No URL");
+    console.log("DEBUG [AdminImages]: Image file provided:", !!imageFile);
+    
     // Set isUploaded flag based on whether a file was provided
     setNewImage({ 
       ...newImage, 
       url: imageUrl,
       isUploaded: !!imageFile 
     });
-    console.log("Image selected:", imageUrl.substring(0, 50) + "...", "Is file upload:", !!imageFile);
   };
 
   const resetNewImageForm = () => {
@@ -67,10 +79,60 @@ const AdminImages = () => {
   };
 
   const handleAddImage = () => {
-    if (!newImage.name || !newImage.url || !newImage.location) {
+    console.log("DEBUG [AdminImages]: handleAddImage called");
+    console.log("DEBUG [AdminImages]: newImage state:", {
+      name: newImage.name,
+      location: newImage.location,
+      urlExists: !!newImage.url,
+      urlLength: newImage.url?.length || 0
+    });
+    
+    if (!newImage.name) {
+      console.log("DEBUG [AdminImages]: Missing name");
       toast({
-        title: "Missing required fields",
-        description: "Please provide a name, image URL or upload, and location",
+        title: "Missing required field",
+        description: "Please provide a name for the image",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    if (!newImage.location) {
+      console.log("DEBUG [AdminImages]: Missing location");
+      toast({
+        title: "Missing required field",
+        description: "Please provide a location for the image",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    if (!newImage.url) {
+      console.log("DEBUG [AdminImages]: Missing URL");
+      toast({
+        title: "Missing required field",
+        description: "Please upload an image or provide a valid URL",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    // More detailed URL validation
+    if (typeof newImage.url !== 'string') {
+      console.error("DEBUG [AdminImages]: URL is not a string:", typeof newImage.url);
+      toast({
+        title: "Invalid URL",
+        description: "The image URL is not valid",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (newImage.url.trim() === '') {
+      console.error("DEBUG [AdminImages]: URL is empty string");
+      toast({
+        title: "Missing required field",
+        description: "Please upload an image or provide a valid URL",
         variant: "destructive",
       });
       return;
@@ -79,7 +141,7 @@ const AdminImages = () => {
     setIsSubmitting(true);
 
     try {
-      console.log("Adding image with data:", {
+      console.log("DEBUG [AdminImages]: Calling addImage with data:", {
         name: newImage.name,
         location: newImage.location,
         isUploaded: newImage.isUploaded,
@@ -87,6 +149,8 @@ const AdminImages = () => {
       });
 
       const imageId = addImage(newImage as Omit<WebsiteImage, 'id'>);
+      
+      console.log("DEBUG [AdminImages]: Result of addImage:", imageId);
       
       if (imageId) {
         toast({
@@ -103,7 +167,8 @@ const AdminImages = () => {
         });
       }
     } catch (error) {
-      console.error("Error adding image:", error);
+      console.error("DEBUG [AdminImages]: Error adding image:", error);
+      console.error("DEBUG [AdminImages]: Error stack:", (error as Error).stack);
       toast({
         title: "Error",
         description: "An unexpected error occurred while adding the image",
@@ -115,6 +180,7 @@ const AdminImages = () => {
   };
 
   const handleUpdateImage = (updatedImage: WebsiteImage) => {
+    console.log("DEBUG [AdminImages]: Updating image:", updatedImage.id);
     const success = updateImage(updatedImage);
     if (success) {
       toast({
@@ -131,6 +197,7 @@ const AdminImages = () => {
   };
 
   const handleDeleteImage = (id: string) => {
+    console.log("DEBUG [AdminImages]: Deleting image:", id);
     const success = removeImage(id);
     if (success) {
       toast({
@@ -198,6 +265,7 @@ const AdminImages = () => {
 
         {/* Add New Image Dialog */}
         <Dialog open={isAddDialogOpen} onOpenChange={(open) => {
+          console.log("DEBUG [AdminImages]: Add dialog open change:", open);
           setIsAddDialogOpen(open);
           if (!open) {
             resetNewImageForm();
@@ -214,7 +282,10 @@ const AdminImages = () => {
                   id="image-name"
                   placeholder="e.g., Homepage Hero Banner"
                   value={newImage.name}
-                  onChange={(e) => setNewImage({ ...newImage, name: e.target.value })}
+                  onChange={(e) => {
+                    console.log("DEBUG [AdminImages]: Setting image name:", e.target.value);
+                    setNewImage({ ...newImage, name: e.target.value });
+                  }}
                 />
               </div>
 
@@ -224,7 +295,10 @@ const AdminImages = () => {
                   id="image-location"
                   placeholder="e.g., homepage-hero"
                   value={newImage.location}
-                  onChange={(e) => setNewImage({ ...newImage, location: e.target.value })}
+                  onChange={(e) => {
+                    console.log("DEBUG [AdminImages]: Setting image location:", e.target.value);
+                    setNewImage({ ...newImage, location: e.target.value });
+                  }}
                 />
                 <p className="text-sm text-muted-foreground">
                   This helps identify where this image is used on the website

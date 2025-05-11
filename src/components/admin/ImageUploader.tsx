@@ -19,11 +19,11 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({ onImageSelected, currentU
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) {
-      console.log("DEBUG: No file selected");
+      console.log("DEBUG [ImageUploader]: No file selected");
       return;
     }
 
-    console.log("DEBUG: File selected", { 
+    console.log("DEBUG [ImageUploader]: File selected", { 
       name: file.name, 
       type: file.type, 
       size: `${(file.size / 1024).toFixed(2)}KB` 
@@ -31,7 +31,7 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({ onImageSelected, currentU
 
     // For image size validation
     if (file.size > 5 * 1024 * 1024) { // 5MB
-      console.log("DEBUG: File too large", { size: file.size });
+      console.log("DEBUG [ImageUploader]: File too large", { size: file.size });
       toast({
         title: "File too large",
         description: "Image must be less than 5MB",
@@ -47,8 +47,35 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({ onImageSelected, currentU
     const reader = new FileReader();
     reader.onload = (event) => {
       const result = event.target?.result as string;
-      console.log("DEBUG: File read success, data URL length:", result?.length || 0);
+      console.log("DEBUG [ImageUploader]: File read success, data URL length:", result?.length || 0);
+      console.log("DEBUG [ImageUploader]: File result type:", typeof result);
+      
+      // Validate the data URL
+      if (!result || result.trim() === '') {
+        console.error("DEBUG [ImageUploader]: Empty result from FileReader");
+        toast({
+          title: "Error loading image",
+          description: "Could not read the image file",
+          variant: "destructive",
+        });
+        setIsLoading(false);
+        return;
+      }
+      
+      // Verify it's actually a data URL
+      if (!result.startsWith('data:')) {
+        console.error("DEBUG [ImageUploader]: Result is not a valid data URL format");
+        toast({
+          title: "Error loading image",
+          description: "Invalid image format",
+          variant: "destructive",
+        });
+        setIsLoading(false);
+        return;
+      }
+      
       setPreviewUrl(result);
+      console.log("DEBUG [ImageUploader]: Calling onImageSelected with data URL and file");
       onImageSelected(result, file); // Pass both the data URL and the file
       setIsLoading(false);
       
@@ -58,7 +85,7 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({ onImageSelected, currentU
       });
     };
     reader.onerror = (error) => {
-      console.error("DEBUG: File read error", error);
+      console.error("DEBUG [ImageUploader]: File read error", error);
       toast({
         title: "Error loading image",
         description: "Failed to read the selected image file",
@@ -71,7 +98,29 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({ onImageSelected, currentU
 
   const handleExternalUrlChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const url = e.target.value.trim();
-    console.log("DEBUG: URL entered:", url ? url.substring(0, 30) + "..." : "empty");
+    console.log("DEBUG [ImageUploader]: URL entered:", url ? url.substring(0, 30) + "..." : "empty");
+    
+    if (url === '') {
+      console.log("DEBUG [ImageUploader]: Empty URL entered");
+      setPreviewUrl('');
+      setImageFile(null);
+      return;
+    }
+    
+    // Check if it's a valid URL format 
+    try {
+      new URL(url); // This will throw if invalid
+      console.log("DEBUG [ImageUploader]: URL format is valid");
+    } catch (error) {
+      console.error("DEBUG [ImageUploader]: Invalid URL format:", error);
+      toast({
+        title: "Invalid URL",
+        description: "Please enter a valid URL",
+        variant: "destructive",
+      });
+      return;
+    }
+    
     setPreviewUrl(url);
     setImageFile(null);
     onImageSelected(url); // Only pass URL for external images
@@ -127,7 +176,7 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({ onImageSelected, currentU
               alt="Preview" 
               className="max-h-64 mx-auto object-contain"
               onError={(e) => {
-                console.error("DEBUG: Image preview error", { url: previewUrl });
+                console.error("DEBUG [ImageUploader]: Image preview error", { url: previewUrl });
                 toast({
                   title: "Error loading image",
                   description: "The image URL is invalid or inaccessible",

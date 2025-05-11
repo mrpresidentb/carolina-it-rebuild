@@ -52,39 +52,49 @@ export const useWebsiteImages = () => {
   // Add a new image
   const addImage = (image: Omit<WebsiteImage, 'id'>) => {
     try {
-      console.log("DEBUG: Adding new image:", { 
+      console.log("DEBUG [addImage]: Adding new image:", { 
         name: image.name, 
         location: image.location,
         hasURL: !!image.url
       });
       
-      // Validate URL
-      if (!image.url || image.url.trim() === '') {
-        console.error("DEBUG: Cannot add image without URL");
+      // Enhanced URL validation logging
+      if (!image.url) {
+        console.error("DEBUG [addImage]: Cannot add image - URL is null or undefined");
         return null;
       }
       
-      console.log("DEBUG: URL validation passed. URL length:", image.url.length);
-      console.log("DEBUG: URL preview:", image.url.substring(0, 30) + (image.url.length > 30 ? '...' : ''));
+      if (image.url.trim() === '') {
+        console.error("DEBUG [addImage]: Cannot add image - URL is empty string");
+        return null;
+      }
       
+      console.log("DEBUG [addImage]: URL validation passed. URL type:", typeof image.url);
+      console.log("DEBUG [addImage]: URL length:", image.url.length);
+      console.log("DEBUG [addImage]: URL preview:", image.url.substring(0, 30) + (image.url.length > 30 ? '...' : ''));
+      
+      // Create new image object with ID
       const newImage = {
         ...image,
         id: Date.now().toString()
       } as WebsiteImage;
       
-      console.log("DEBUG: Saving new image with ID:", newImage.id);
+      console.log("DEBUG [addImage]: Saving new image with ID:", newImage.id);
       const success = saveImage(newImage);
-      console.log("DEBUG: Image save result:", success);
+      console.log("DEBUG [addImage]: Image save result:", success);
       
       if (success) {
-        console.log("DEBUG: Image saved successfully, refreshing images list");
-        setImages(getWebsiteImages());
+        console.log("DEBUG [addImage]: Image saved successfully, refreshing images list");
+        const updatedImages = getWebsiteImages();
+        console.log("DEBUG [addImage]: Updated image count:", updatedImages.length);
+        setImages(updatedImages);
         return newImage.id;
       }
-      console.log("DEBUG: Failed to save image");
+      console.log("DEBUG [addImage]: Failed to save image");
       return null;
     } catch (error) {
-      console.error("DEBUG: Error adding image:", error);
+      console.error("DEBUG [addImage]: Error adding image:", error);
+      console.error("DEBUG [addImage]: Error stack:", (error as Error).stack);
       return null;
     }
   };
