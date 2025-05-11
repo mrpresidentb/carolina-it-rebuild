@@ -12,6 +12,7 @@ import { Label } from '@/components/ui/label';
 import ImageUploader from '@/components/admin/ImageUploader';
 import { useToast } from '@/hooks/use-toast';
 import AdminLayout from '@/components/admin/AdminLayout';
+import { Toaster } from '@/components/ui/toaster';
 
 const AdminImages = () => {
   const { images, isLoaded, updateImage, addImage, removeImage } = useWebsiteImages();
@@ -50,6 +51,21 @@ const AdminImages = () => {
     console.log("Image selected:", imageUrl.substring(0, 50) + "...", "Is file upload:", !!imageFile);
   };
 
+  const resetNewImageForm = () => {
+    setNewImage({
+      name: '',
+      url: '',
+      alt: '',
+      location: '',
+      isUploaded: false,
+      seo: {
+        title: '',
+        description: '',
+        keywords: ''
+      }
+    });
+  };
+
   const handleAddImage = () => {
     if (!newImage.name || !newImage.url || !newImage.location) {
       toast({
@@ -78,18 +94,7 @@ const AdminImages = () => {
           description: `The image "${newImage.name}" has been added to your website`,
         });
         setIsAddDialogOpen(false);
-        setNewImage({
-          name: '',
-          url: '',
-          alt: '',
-          location: '',
-          isUploaded: false,
-          seo: {
-            title: '',
-            description: '',
-            keywords: ''
-          }
-        });
+        resetNewImageForm();
       } else {
         toast({
           title: "Error",
@@ -149,8 +154,8 @@ const AdminImages = () => {
     <AdminLayout title="Images">
       <div className="space-y-6">
         <div className="flex items-center justify-between">
-          <h1 className="text-2xl font-bold">Website Images</h1>
-          <Button onClick={() => setIsAddDialogOpen(true)}>
+          <h1 className="text-2xl font-bold text-gray-800">Website Images</h1>
+          <Button onClick={() => setIsAddDialogOpen(true)} className="bg-blue-500 hover:bg-blue-600">
             <Plus className="h-4 w-4 mr-2" />
             Add New Image
           </Button>
@@ -192,7 +197,12 @@ const AdminImages = () => {
         />
 
         {/* Add New Image Dialog */}
-        <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
+        <Dialog open={isAddDialogOpen} onOpenChange={(open) => {
+          setIsAddDialogOpen(open);
+          if (!open) {
+            resetNewImageForm();
+          }
+        }}>
           <DialogContent className="sm:max-w-md">
             <DialogHeader>
               <DialogTitle>Add New Image</DialogTitle>
@@ -243,6 +253,7 @@ const AdminImages = () => {
                 <Button 
                   onClick={handleAddImage} 
                   disabled={isSubmitting}
+                  className="bg-blue-500 hover:bg-blue-600"
                 >
                   {isSubmitting ? 'Adding...' : 'Add Image'}
                 </Button>
@@ -251,6 +262,7 @@ const AdminImages = () => {
           </DialogContent>
         </Dialog>
       </div>
+      <Toaster />
     </AdminLayout>
   );
 };

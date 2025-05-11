@@ -30,6 +30,7 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({ onImageSelected, currentU
       return;
     }
 
+    setIsLoading(true);
     setImageFile(file);
 
     // Create a preview URL
@@ -38,6 +39,20 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({ onImageSelected, currentU
       const result = event.target?.result as string;
       setPreviewUrl(result);
       onImageSelected(result, file); // Pass both the data URL and the file
+      setIsLoading(false);
+      
+      toast({
+        title: "Image selected",
+        description: "Image has been selected and is ready to be saved.",
+      });
+    };
+    reader.onerror = () => {
+      toast({
+        title: "Error loading image",
+        description: "Failed to read the selected image file",
+        variant: "destructive",
+      });
+      setIsLoading(false);
     };
     reader.readAsDataURL(file);
   };
@@ -47,6 +62,13 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({ onImageSelected, currentU
     setPreviewUrl(url);
     setImageFile(null);
     onImageSelected(url); // Only pass URL for external images
+    
+    if (url) {
+      toast({
+        title: "URL entered",
+        description: "External image URL has been set",
+      });
+    }
   };
 
   return (
@@ -60,6 +82,7 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({ onImageSelected, currentU
             accept="image/*" 
             onChange={handleFileChange} 
             className="mt-1"
+            disabled={isLoading}
           />
           <p className="text-sm text-gray-500 mt-1">Max file size: 5MB</p>
         </div>
@@ -77,6 +100,7 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({ onImageSelected, currentU
             onChange={handleExternalUrlChange}
             defaultValue={currentUrl}
             className="mt-1"
+            disabled={isLoading}
           />
         </div>
       </div>
@@ -99,6 +123,12 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({ onImageSelected, currentU
               }}
             />
           </div>
+        </div>
+      )}
+      
+      {isLoading && (
+        <div className="text-center text-sm text-blue-600">
+          Processing image...
         </div>
       )}
     </div>

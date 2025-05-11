@@ -22,6 +22,7 @@ import { AdminAuthProvider, useAdminAuth } from './contexts/AdminAuthContext';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import SiteHead from './components/SiteHead';
+import { Toaster } from '@/components/ui/toaster';
 
 // Layout component to wrap public pages with Navbar and Footer
 const PublicLayout = ({ children }: { children: React.ReactNode }) => {
@@ -95,6 +96,7 @@ const App = () => {
           } />
           <Route path="/admin/login" element={<AdminLogin />} />
         </Routes>
+        <Toaster />
       </BrowserRouter>
     </AdminAuthProvider>
   );

@@ -3,10 +3,11 @@ import React, { useState } from 'react';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { WebsiteImage } from '@/models/WebsiteImage';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Pencil, FileImage, Trash2 } from 'lucide-react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Pencil, Image, Trash2 } from 'lucide-react';
 import ImageSEOForm from './ImageSEOForm';
 import ImageUploader from './ImageUploader';
+import { useToast } from '@/hooks/use-toast';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 
 interface ImageCardProps {
@@ -18,20 +19,61 @@ interface ImageCardProps {
 const ImageCard: React.FC<ImageCardProps> = ({ image, onUpdate, onDelete }) => {
   const [editMode, setEditMode] = useState<'image' | 'seo' | null>(null);
   const [tempImage, setTempImage] = useState<WebsiteImage>({ ...image });
+  const [isSaving, setIsSaving] = useState(false);
+  const { toast } = useToast();
 
   const handleImageSelected = (imageUrl: string) => {
     setTempImage({ ...tempImage, url: imageUrl });
   };
 
   const handleSaveImage = () => {
-    onUpdate(tempImage);
-    setEditMode(null);
+    if (!tempImage.url) {
+      toast({
+        title: "Error",
+        description: "Image URL is required",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    setIsSaving(true);
+    
+    try {
+      onUpdate(tempImage);
+      toast({
+        title: "Success",
+        description: "Image has been updated successfully",
+      });
+      setEditMode(null);
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to update image",
+        variant: "destructive",
+      });
+      console.error("Error updating image:", error);
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const handleSEOUpdate = (updatedImage: Partial<WebsiteImage>) => {
-    const newImage = { ...image, ...updatedImage };
-    onUpdate(newImage);
-    setEditMode(null);
+    try {
+      const newImage = { ...image, ...updatedImage };
+      onUpdate(newImage);
+      toast({
+        title: "Success",
+        description: "SEO information has been updated",
+      });
+      setEditMode(null);
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to update SEO information",
+        variant: "destructive",
+      });
+      console.error("Error updating SEO info:", error);
+    }
   };
 
   return (
@@ -67,11 +109,14 @@ const ImageCard: React.FC<ImageCardProps> = ({ image, onUpdate, onDelete }) => {
       <CardFooter className="border-t pt-3 justify-between">
         <Dialog open={editMode === 'image'} onOpenChange={(open) => {
           if (!open) setEditMode(null);
-          if (open) setEditMode('image');
+          if (open) {
+            setEditMode('image');
+            setTempImage({ ...image }); // Reset temp image when opening dialog
+          }
         }}>
           <DialogTrigger asChild>
             <Button variant="outline" size="sm">
-              <FileImage className="h-4 w-4 mr-1" />
+              <Image className="h-4 w-4 mr-1" />
               Change Image
             </Button>
           </DialogTrigger>
@@ -85,8 +130,11 @@ const ImageCard: React.FC<ImageCardProps> = ({ image, onUpdate, onDelete }) => {
                 <Button variant="outline" onClick={() => setEditMode(null)}>
                   Cancel
                 </Button>
-                <Button onClick={handleSaveImage}>
-                  Save Changes
+                <Button 
+                  onClick={handleSaveImage}
+                  disabled={isSaving}
+                >
+                  {isSaving ? "Saving..." : "Save Changes"}
                 </Button>
               </div>
             </div>
@@ -127,7 +175,13 @@ const ImageCard: React.FC<ImageCardProps> = ({ image, onUpdate, onDelete }) => {
               </AlertDialogHeader>
               <AlertDialogFooter>
                 <AlertDialogCancel>Cancel</AlertDialogCancel>
-                <AlertDialogAction onClick={() => onDelete(image.id)}>
+                <AlertDialogAction onClick={() => {
+                  onDelete(image.id);
+                  toast({
+                    title: "Success",
+                    description: `Image "${image.name}" has been deleted`,
+                  });
+                }}>
                   Delete
                 </AlertDialogAction>
               </AlertDialogFooter>
