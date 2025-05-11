@@ -37,6 +37,12 @@ export const getWebsiteImages = (): WebsiteImage[] => {
     if (savedImages) {
       const parsedImages = JSON.parse(savedImages);
       console.log(`DEBUG [websiteImages]: Found ${parsedImages.length} images in localStorage`);
+      
+      // Log details about the images for debugging
+      parsedImages.forEach((img: WebsiteImage) => {
+        console.log(`DEBUG [websiteImages]: Image: ${img.id}, location: ${img.location}, name: ${img.name}`);
+      });
+      
       return parsedImages;
     }
     
@@ -70,7 +76,7 @@ export const getImageByLocation = (location: string): WebsiteImage | undefined =
     const image = images.find(image => image.location === location);
     console.log(`DEBUG [websiteImages]: Found image by location ${location}: ${!!image}`);
     if (image) {
-      console.log(`DEBUG [websiteImages]: Image details - id: ${image.id}, name: ${image.name}, url length: ${image.url.length}`);
+      console.log(`DEBUG [websiteImages]: Image details - id: ${image.id}, name: ${image.name}, url length: ${image.url?.length || 0}`);
     }
     return image;
   } catch (error) {
@@ -102,13 +108,32 @@ export const saveImage = (image: WebsiteImage): boolean => {
       return false;
     }
     
+    // Get current images
     const images = getWebsiteImages();
+    console.log(`DEBUG [websiteImages]: Current images count before save: ${images.length}`);
+    
+    // Check if we're updating an existing image (by ID)
     const existingIndex = images.findIndex(img => img.id === image.id);
+    console.log(`DEBUG [websiteImages]: Existing image index: ${existingIndex}`);
     
     if (existingIndex >= 0) {
-      // Update existing image
+      // Update existing image - make a copy of the array
       console.log(`DEBUG [websiteImages]: Updating existing image at index ${existingIndex}`);
-      images[existingIndex] = image;
+      
+      // Create a new array with the updated image
+      const updatedImages = [...images];
+      updatedImages[existingIndex] = { ...image };
+      
+      // Verify the update was made
+      console.log(`DEBUG [websiteImages]: Updated image in array:`, {
+        id: updatedImages[existingIndex].id,
+        name: updatedImages[existingIndex].name,
+        location: updatedImages[existingIndex].location
+      });
+      
+      // Save to localStorage
+      console.log(`DEBUG [websiteImages]: Saving ${updatedImages.length} images to localStorage`);
+      localStorage.setItem('website_images', JSON.stringify(updatedImages));
     } else {
       // Add new image with a unique ID
       console.log("DEBUG [websiteImages]: Adding new image with ID:", image.id);
@@ -116,11 +141,14 @@ export const saveImage = (image: WebsiteImage): boolean => {
         ...image,
         id: image.id || Date.now().toString()
       };
-      images.push(newImage);
+      
+      // Create a new array with the new image
+      const updatedImages = [...images, newImage];
+      
+      // Save to localStorage
+      console.log(`DEBUG [websiteImages]: Saving ${updatedImages.length} images to localStorage`);
+      localStorage.setItem('website_images', JSON.stringify(updatedImages));
     }
-    
-    console.log(`DEBUG [websiteImages]: Saving ${images.length} images to localStorage`);
-    localStorage.setItem('website_images', JSON.stringify(images));
     
     // Verify save was successful
     const savedDataString = localStorage.getItem('website_images');
@@ -143,7 +171,7 @@ export const saveImage = (image: WebsiteImage): boolean => {
       console.log("DEBUG [websiteImages]: Image verified in saved data:", {
         id: savedImage.id,
         name: savedImage.name,
-        urlLength: savedImage.url?.length || 0
+        url: savedImage.url ? savedImage.url.substring(0, 30) + "..." : "none"
       });
       
       return true;

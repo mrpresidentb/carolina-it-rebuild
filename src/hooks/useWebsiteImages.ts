@@ -49,14 +49,18 @@ export const useWebsiteImages = () => {
       console.log("DEBUG [updateImage]: Image URL length:", image.url.length);
       console.log("DEBUG [updateImage]: Image URL starts with:", image.url.substring(0, 30));
       
+      // Force re-saving the image - this will ensure we properly update the localStorage
       console.log("DEBUG [updateImage]: Calling saveImage function");
       const success = saveImage(image);
       console.log("DEBUG [updateImage]: Image update result:", success);
       
       if (success) {
         console.log("DEBUG [updateImage]: Update successful, refreshing images list");
+        // Get a fresh copy of images to ensure we have the latest data
         const refreshedImages = getWebsiteImages();
         console.log("DEBUG [updateImage]: Refreshed images count:", refreshedImages.length);
+        
+        // Make sure we update our state with the refreshed data
         setImages(refreshedImages);
         return true;
       }
@@ -148,6 +152,13 @@ export const useWebsiteImages = () => {
     console.log("DEBUG: Looking up image for location:", location);
     const image = getImageByLocation(location);
     console.log("DEBUG: Image found:", !!image);
+    if (image) {
+      console.log("DEBUG: Image details for location:", location, {
+        id: image.id,
+        name: image.name,
+        url: image.url ? image.url.substring(0, 30) + "..." : "none"
+      });
+    }
     return image;
   };
 
