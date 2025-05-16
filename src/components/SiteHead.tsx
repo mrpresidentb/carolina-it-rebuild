@@ -1,4 +1,3 @@
-
 import React, { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import { useSettings } from '@/hooks/useSettings';
@@ -59,17 +58,26 @@ const SiteHead: React.FC = () => {
       settings.seo.socialMedia.ogImage
     );
     
-    // Set canonical URL if provided
-    if (settings.seo.advanced.canonicalUrl) {
-      let canonicalTag = document.querySelector('link[rel="canonical"]');
-      if (!canonicalTag) {
-        canonicalTag = document.createElement('link');
-        canonicalTag.setAttribute('rel', 'canonical');
-        document.head.appendChild(canonicalTag);
-      }
-      canonicalTag.setAttribute('href', settings.seo.advanced.canonicalUrl);
+    // Set canonical URL if provided, else fallback to location.origin + pathname
+    let canonicalUrl = settings.seo.advanced.canonicalUrl;
+    if (!canonicalUrl) {
+      canonicalUrl = window.location.origin + location.pathname;
     }
-    
+    let canonicalTag = document.querySelector('link[rel="canonical"]');
+    if (!canonicalTag) {
+      canonicalTag = document.createElement('link');
+      canonicalTag.setAttribute('rel', 'canonical');
+      document.head.appendChild(canonicalTag);
+    }
+    canonicalTag.setAttribute('href', canonicalUrl);
+
+    // Add/update Twitter Card tags
+    updateTwitterTags(
+      pageSeo.title || settings.seo.siteTitle,
+      pageSeo.description || settings.seo.siteDescription,
+      settings.seo.socialMedia.ogImage
+    );
+
     // Add JSON-LD structured data if provided
     updateStructuredData(settings.seo.advanced.structuredData);
     
@@ -122,6 +130,42 @@ const SiteHead: React.FC = () => {
       document.head.appendChild(ogTypeTag);
     }
     ogTypeTag.setAttribute('content', 'website');
+  };
+  
+  const updateTwitterTags = (title: string, description: string, image: string) => {
+    let twitterTitle = document.querySelector('meta[name="twitter:title"]');
+    if (!twitterTitle) {
+      twitterTitle = document.createElement('meta');
+      twitterTitle.setAttribute('name', 'twitter:title');
+      document.head.appendChild(twitterTitle);
+    }
+    twitterTitle.setAttribute('content', title);
+
+    let twitterDescription = document.querySelector('meta[name="twitter:description"]');
+    if (!twitterDescription) {
+      twitterDescription = document.createElement('meta');
+      twitterDescription.setAttribute('name', 'twitter:description');
+      document.head.appendChild(twitterDescription);
+    }
+    twitterDescription.setAttribute('content', description);
+
+    if (image) {
+      let twitterImage = document.querySelector('meta[name="twitter:image"]');
+      if (!twitterImage) {
+        twitterImage = document.createElement('meta');
+        twitterImage.setAttribute('name', 'twitter:image');
+        document.head.appendChild(twitterImage);
+      }
+      twitterImage.setAttribute('content', image);
+    }
+
+    let twitterCard = document.querySelector('meta[name="twitter:card"]');
+    if (!twitterCard) {
+      twitterCard = document.createElement('meta');
+      twitterCard.setAttribute('name', 'twitter:card');
+      document.head.appendChild(twitterCard);
+    }
+    twitterCard.setAttribute('content', 'summary_large_image');
   };
   
   const updateStructuredData = (jsonLdString: string) => {

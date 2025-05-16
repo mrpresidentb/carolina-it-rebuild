@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import Index from './pages/Index';
@@ -23,6 +22,7 @@ import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import SiteHead from './components/SiteHead';
 import { Toaster } from '@/components/ui/toaster';
+import SitemapXml from "@/pages/SitemapXml";
 
 // Layout component to wrap public pages with Navbar and Footer
 const PublicLayout = ({ children }: { children: React.ReactNode }) => {
@@ -61,6 +61,7 @@ const App = () => {
           <Route path="/contact" element={<PublicLayout><Contact /></PublicLayout>} />
           <Route path="/privacy-policy" element={<PublicLayout><PrivacyPolicy /></PublicLayout>} />
           <Route path="/terms-of-use" element={<PublicLayout><TermsOfUse /></PublicLayout>} />
+          <Route path="/sitemap.xml" element={<SitemapXml />} />
           <Route path="*" element={<PublicLayout><NotFound /></PublicLayout>} />
           
           {/* Admin Routes */}
